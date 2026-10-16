@@ -69,8 +69,8 @@ a { color: inherit; }
 .icon-btn:disabled { opacity: .35; cursor: default; }
 
 /* ---------- wordmark ---------- */
-.wordmark { font-family: var(--display); font-size: 26px; line-height: 1; letter-spacing: -.01em; text-decoration: none; color: var(--ink); display: inline-flex; align-items: baseline; gap: 1px; }
-.wordmark i { font-style: italic; color: var(--ember); }
+.wordmark { font-family: var(--display); font-size: 26px; line-height: 1; letter-spacing: -.01em; text-decoration: none; color: var(--ink); display: inline-block; white-space: nowrap; }
+.wordmark i { font-style: italic; color: var(--ember); margin-left: -.02em; }
 
 /* ============================================================
    Boot loader — the word being set, letter by letter
@@ -103,7 +103,7 @@ a { color: inherit; }
 .proof-demo svg { overflow: visible; }
 .proof-demo path { fill: none; stroke: var(--ember); stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 400; stroke-dashoffset: 400; }
 .proof-demo.on path { animation: draw .7s var(--ease) forwards; }
-.proof-tag { position: absolute; white-space: nowrap; font-family: var(--display); font-style: italic; color: var(--ember); font-size: 22px; opacity: 0; transform: translateY(6px); transition: opacity .4s, transform .4s var(--ease); }
+.proof-tag { position: absolute; white-space: nowrap; font-family: var(--display); font-style: italic; color: var(--ember); font-size: 17px; opacity: 0; transform: translateY(6px); transition: opacity .4s, transform .4s var(--ease); }
 .proof-demo.on .proof-tag { opacity: 1; transform: none; transition-delay: .5s; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 

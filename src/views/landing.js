@@ -109,7 +109,7 @@ export function renderLanding(app) {
       const mark = document.createElement('div');
       mark.className = 'proof-demo';
       mark.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${hh}px`;
-      mark.innerHTML = `<svg width="${w}" height="${hh}"><path d="M${w * 0.52},${1} C${w * 1.08},${-1} ${w * 1.05},${hh + 2} ${w * 0.5},${hh} C${-w * 0.06},${hh - 1} ${-w * 0.04},${0} ${w * 0.62},${3}"/></svg><span class="proof-tag" style="left:${w * 0.1}px;top:-30px">Built</span>`;
+      mark.innerHTML = `<svg width="${w}" height="${hh}"><path d="M${w * 0.52},${1} C${w * 1.08},${-1} ${w * 1.05},${hh + 2} ${w * 0.5},${hh} C${-w * 0.06},${hh - 1} ${-w * 0.04},${0} ${w * 0.62},${3}"/></svg><span class="proof-tag" style="left:-34px;top:-4px">Built</span>`;
       stage.appendChild(mark);
       requestAnimationFrame(() => mark.classList.add('on'));
       timers.push(
