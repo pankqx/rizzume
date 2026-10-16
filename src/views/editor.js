@@ -3,7 +3,8 @@ import { SECTION_PRESETS, newSection, blankEntry, bullet, uid, setAt, getAt } fr
 import { paintSheet, sheetEl, TEMPLATES, ACCENTS } from '../render.js';
 import { fit } from '../fit.js';
 import { proofread, matchJD } from '../coach.js';
-import { downloadPdf, saveBlob, fileBase } from '../pdf.js';
+import { saveBlob, fileBase } from '../files.js';
+const downloadPdf = (r) => import('../pdf.js').then((m) => m.downloadPdf(r));
 import { toTex } from '../tex.js';
 import { ui } from '../icons.js';
 import { h, esc, menu, toast, ask } from '../ui.js';
@@ -761,6 +762,7 @@ export function renderEditor(app, id) {
   document.addEventListener('keydown', onKey);
 
   // ---------------- go ----------------
+  const warm = setTimeout(() => import('../pdf.js').catch(() => {}), 2500);
   syncUndo();
   saveState.innerHTML = `${ui('check', 15)}Saved`;
   document.fonts.ready.then(() => { paint(); drawPanel(); if (r.jd) runJD(); });
@@ -769,6 +771,7 @@ export function renderEditor(app, id) {
 
   return () => {
     document.removeEventListener('keydown', onKey);
+    clearTimeout(warm);
     ro.disconnect();
     Object.values(timers).forEach(clearTimeout);
     if (window.CSS?.highlights) CSS.highlights.delete('jd-hit');

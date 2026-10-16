@@ -4,7 +4,7 @@ import { sheetEl } from '../render.js';
 import { fit } from '../fit.js';
 import { ui } from '../icons.js';
 import { h, esc, menu, modal, ask, toast, timeAgo, pickFile } from '../ui.js';
-import { saveBlob } from '../pdf.js';
+import { saveBlob } from '../files.js';
 
 export async function importJsonFile() {
   const f = await pickFile('.json,application/json');

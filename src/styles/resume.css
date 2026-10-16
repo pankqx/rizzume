@@ -143,3 +143,5 @@
   content: ''; position: absolute; left: 0; right: 0; top: 841.89pt; border-top: 1.5px dashed #e2531f; pointer-events: none;
 }
 ::highlight(jd-hit) { background-color: #ffe58a; color: inherit; }
+.tpl-compact .r-k-entries:has(.r-entry:last-child > .r-ul) + .r-sec { margin-top: calc(9 * var(--gap)); }
+.tpl-modern .r-k-entries:has(.r-entry:last-child > .r-ul) + .r-sec { margin-top: calc(14 * var(--gap)); }
