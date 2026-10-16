@@ -88,6 +88,8 @@ export function renderLanding(app) {
   const exp = demo.sections.find((s) => s.type === 'experience');
   exp.items[0].bullets[0].text = exp.items[0].bullets[0].text.replace(/^Built/, 'Worked on');
   const stage = app.querySelector('#stage');
+  const heroScale = Math.min(0.5, (stage.parentElement.clientWidth - 8) / 793.7);
+  stage.style.setProperty('--s', heroScale);
   const sheet = sheetEl(demo);
   stage.appendChild(sheet);
   fit(sheet, demo);
@@ -109,6 +111,7 @@ export function renderLanding(app) {
       const mark = document.createElement('div');
       mark.className = 'proof-demo';
       mark.style.cssText = `left:${x}px;top:${y}px;width:${w}px;height:${hh}px`;
+      mark.style.setProperty('--x', 0);
       mark.innerHTML = `<svg width="${w}" height="${hh}"><path d="M${w * 0.52},${1} C${w * 1.08},${-1} ${w * 1.05},${hh + 2} ${w * 0.5},${hh} C${-w * 0.06},${hh - 1} ${-w * 0.04},${0} ${w * 0.62},${3}"/></svg><span class="proof-tag" style="left:-34px;top:-4px">Built</span>`;
       stage.appendChild(mark);
       requestAnimationFrame(() => mark.classList.add('on'));
@@ -126,6 +129,7 @@ export function renderLanding(app) {
   // ---- Fit demo ----
   const fd = sampleResume();
   const fdHost = app.querySelector('#fitdemo');
+  fdHost.style.setProperty('--s', Math.min(0.4, (fdHost.parentElement.clientWidth - 32) / 793.7));
   const fdSheet = sheetEl(fd);
   fdHost.appendChild(fdSheet);
   const meter = app.querySelector('#fitmeter');

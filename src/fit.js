@@ -8,7 +8,7 @@ export const AVAIL_H = (841.89 - 72) * PX_PER_PT;
 function params(u, base) {
   let k, fs;
   if (u <= 0) {
-    k = 1 + Math.max(u, -0.5) * 0.8;
+    k = 1 + Math.max(u, -0.5) * 0.6;
     fs = base + Math.min(0, u + 0.5) * 2 * 1.25;
   } else {
     k = 1 + (Math.min(u, 0.6) / 0.6) * 0.55;
