@@ -1,0 +1,12 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#888}</style></head>
+<body><div id="out"></div><script type="module">
+import '../src/styles/resume.css';
+import { normalize } from '../src/model.js';
+import { sheetEl } from '../src/render.js';
+const q=new URLSearchParams(location.search);
+const data = await (await fetch(q.get('src')||'/dev/pank.json')).json();
+const r = normalize(data); if(q.get('tpl')) r.template=q.get('tpl');
+await document.fonts.load('10pt "LM Roman"');await document.fonts.load('bold 10pt "LM Roman"');await document.fonts.load('italic 10pt "LM Roman"');
+document.getElementById('out').append(sheetEl(r,{editable:q.has('edit')}));
+await document.fonts.ready; document.body.dataset.ready=1;
+</script></body></html>

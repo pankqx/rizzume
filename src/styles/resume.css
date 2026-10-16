@@ -1,0 +1,140 @@
+/* ============================================================
+   The sheet. Units are points so it maps 1:1 to the LaTeX source:
+   article 10pt, a4paper, margin 0.5in, setstretch 1.06.
+   --fs = body size (pt), --k = vertical rhythm multiplier (auto-fit).
+   ============================================================ */
+@font-face { font-family: 'LM Roman'; src: url('../fonts/lmroman10-regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: block; }
+@font-face { font-family: 'LM Roman'; src: url('../fonts/lmroman10-bold.woff2') format('woff2'); font-weight: 700; font-style: normal; font-display: block; }
+@font-face { font-family: 'LM Roman'; src: url('../fonts/lmroman10-italic.woff2') format('woff2'); font-weight: 400; font-style: italic; font-display: block; }
+@font-face { font-family: 'LM Roman'; src: url('../fonts/lmroman10-bolditalic.woff2') format('woff2'); font-weight: 700; font-style: italic; font-display: block; }
+@font-face { font-family: 'LM Roman Caps'; src: url('../fonts/lmromancaps10-regular.woff2') format('woff2'); font-weight: 400; font-display: block; }
+@font-face { font-family: 'Plex Sans'; src: url('../fonts/plexsans-400-normal.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: block; }
+@font-face { font-family: 'Plex Sans'; src: url('../fonts/plexsans-700-normal.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: block; }
+@font-face { font-family: 'Plex Sans'; src: url('../fonts/plexsans-400-italic.ttf') format('truetype'); font-weight: 400; font-style: italic; font-display: block; }
+@font-face { font-family: 'Plex Sans'; src: url('../fonts/plexsans-700-italic.ttf') format('truetype'); font-weight: 700; font-style: italic; font-display: block; }
+
+.sheet {
+  --fs: 10;
+  --k: 1;
+  --accent: #1a1a1a;
+  --pt: calc(var(--fs) * 1pt / 10);         /* 1pt at 10pt body, scales with body size */
+  --gap: calc(var(--k) * 1pt);              /* 1pt of vertical rhythm */
+  position: relative;
+  box-sizing: border-box;
+  width: 595.28pt;
+  min-height: 841.89pt;
+  padding: 36pt;
+  background: #fff;
+  color: #000;
+  font-family: 'LM Roman', 'Latin Modern Roman', serif;
+  font-size: calc(var(--fs) * 1pt);
+  line-height: 1.272;
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  overflow-wrap: break-word;
+}
+.sheet *, .sheet *::before, .sheet *::after { box-sizing: border-box; }
+.sheet a { color: inherit; text-decoration: none; }
+.sheet b { font-weight: 700; }
+.sheet-body { position: relative; }
+
+/* ---------- header ---------- */
+.r-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12pt; margin-bottom: calc(2 * var(--gap)); }
+.r-id { flex: 0 1 60%; min-width: 0; }
+.r-name { font-size: calc(2.4em); line-height: 1.0833; font-weight: 700; padding-top: 1pt; }
+.r-title { font-style: italic; margin-top: 3pt; }
+.r-contact { flex: 0 1 40%; text-align: right; font-size: 0.9em; line-height: 1.296; margin-top: -1pt; }
+.r-c { margin-bottom: 3pt; white-space: nowrap; }
+.r-ico { width: auto; height: 0.86em; vertical-align: -0.1em; fill: currentColor; }
+.r-c .r-ico { height: 0.82em; }
+
+/* ---------- sections ---------- */
+.r-sec { margin-top: calc(9 * var(--gap)); }
+.r-head + .r-sec { margin-top: calc(8 * var(--gap)); }
+.r-h {
+  font-size: 1.2em; line-height: 1.236; font-weight: 700; margin: 0 0 calc(4 * var(--gap));
+  padding-bottom: 0.6pt; border-bottom: 0.4pt solid #000;
+}
+.r-p, .r-line, .r-btext { text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+.r-p { margin: 0; }
+.r-line + .r-line { margin-top: 0; }
+.r-k-lines .r-line { margin-bottom: 0; }
+
+/* ---------- entries ---------- */
+.r-row { display: flex; justify-content: space-between; align-items: baseline; gap: 10pt; }
+.r-row .r-t { font-weight: 700; min-width: 0; }
+.r-row .r-r { white-space: nowrap; flex: none; }
+.r-b { font-weight: 700; }
+.r-it { font-style: italic; }
+.r-det { font-weight: 400; }
+.r-role .r-r a, .r-role .r-r { font-weight: 700; }
+.r-role .r-r .r-ico + .r-sp + span { font-weight: 400; }
+
+.r-ul { list-style: none; margin: calc(3 * var(--gap)) 0 calc(5 * var(--gap)); padding: 0 0 0 1.15em; }
+.r-ul li { position: relative; margin: 0 0 calc(3 * var(--gap)); }
+.r-ul li:last-child { margin-bottom: 0; }
+.r-bul { position: absolute; left: -0.81em; top: 0; }
+.r-role > .r-row + .r-ul { margin-top: calc(1.6 * var(--gap)); }
+.r-entry + .r-entry { margin-top: calc(6 * var(--gap)); }
+.r-role + .r-role { margin-top: calc(2 * var(--gap)); }
+.r-entry:last-child > .r-ul { margin-bottom: 0; }
+
+.r-tight .r-ul { margin-top: calc(1 * var(--gap)); margin-bottom: calc(5 * var(--gap)); }
+.r-tight .r-ul li { margin-bottom: calc(1 * var(--gap)); }
+.r-tight .r-role + .r-role { margin-top: 0; }
+
+.r-school + .r-school { margin-top: calc(6 * var(--gap)); }
+.r-compact + .r-compact { margin-top: calc(5 * var(--gap)); }
+.r-compact .r-row .r-r { font-weight: 400; }
+.r-only { margin-top: 0 !important; }
+.r-only > .r-ul { margin-top: calc(3 * var(--gap)); }
+
+/* ============================================================
+   Template: Modern (sans, accent)
+   ============================================================ */
+.tpl-modern { font-family: 'Plex Sans', system-ui, sans-serif; line-height: 1.36; color: #1d1d1f; }
+.tpl-modern .r-head { flex-direction: column; gap: 4pt; margin-bottom: calc(4 * var(--gap)); }
+.tpl-modern .r-id { flex: none; width: 100%; }
+.tpl-modern .r-name { font-size: 2.25em; letter-spacing: 0; color: var(--accent); line-height: 1.1; }
+.tpl-modern .r-title { font-style: normal; color: #55534e; margin-top: 2pt; }
+.tpl-modern .r-contact { display: flex; flex-wrap: wrap; gap: 2pt 12pt; text-align: left; margin: 0; font-size: 0.92em; color: #3a3935; }
+.tpl-modern .r-c { margin: 0; }
+.tpl-modern .r-ico { fill: var(--accent); }
+.tpl-modern .r-h { font-size: 1.12em; color: var(--accent); border-bottom: 0.6pt solid #cfccc5; padding-bottom: 2pt; }
+.tpl-modern .r-p, .tpl-modern .r-line, .tpl-modern .r-btext { text-align: left; hyphens: manual; }
+.tpl-modern .r-row .r-r { font-weight: 400; color: #55534e; font-style: normal; }
+.tpl-modern .r-sub .r-r { color: #1d1d1f; }
+.tpl-modern .r-bul { color: var(--accent); left: -0.9em; }
+.tpl-modern .r-role .r-r a { font-weight: 400; }
+
+/* ============================================================
+   Template: Compact (small caps, centered, tight)
+   ============================================================ */
+.tpl-compact { line-height: 1.22; }
+.tpl-compact .r-head { flex-direction: column; align-items: center; text-align: center; gap: 2pt; margin-bottom: calc(2 * var(--gap)); }
+.tpl-compact .r-id { flex: none; }
+.tpl-compact .r-name { font-family: 'LM Roman Caps', 'LM Roman', serif; font-weight: 400; font-size: 2.3em; line-height: 1.1; }
+.tpl-compact .r-title { margin-top: 1pt; }
+.tpl-compact .r-contact { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 10pt; text-align: center; margin: 0; }
+.tpl-compact .r-c { margin: 0; }
+.tpl-compact .r-sec { margin-top: calc(6 * var(--gap)); }
+.tpl-compact .r-h { font-family: 'LM Roman Caps', 'LM Roman', serif; font-weight: 400; font-size: 1.18em; margin-bottom: calc(3 * var(--gap)); }
+.tpl-compact .r-ul { margin: calc(1.5 * var(--gap)) 0 calc(3 * var(--gap)); }
+.tpl-compact .r-ul li { margin-bottom: calc(1.5 * var(--gap)); }
+.tpl-compact .r-entry + .r-entry { margin-top: calc(3 * var(--gap)); }
+
+/* ============================================================
+   Editing affordances (screen only, never in the PDF)
+   ============================================================ */
+.is-edit [contenteditable] { outline: none; border-radius: 1.5pt; transition: background-color .15s, box-shadow .15s; cursor: text; }
+.is-edit [contenteditable]:hover { background: rgba(226, 83, 31, .07); }
+.is-edit [contenteditable]:focus { background: rgba(226, 83, 31, .09); box-shadow: 0 0 0 1.5pt rgba(226, 83, 31, .35); }
+.is-edit [contenteditable]:empty::before { content: attr(data-ph); color: #b0aaa0; font-weight: 400; font-style: italic; pointer-events: none; }
+.is-edit .r-pre { color: inherit; }
+.is-edit .r-entry, .is-edit .r-sec { position: relative; }
+.sheet.is-overflow::after {
+  content: ''; position: absolute; left: 0; right: 0; top: 841.89pt; border-top: 1.5px dashed #e2531f; pointer-events: none;
+}
+::highlight(jd-hit) { background-color: #ffe58a; color: inherit; }
