@@ -1,0 +1,11 @@
+{
+  "name": "Rizzume",
+  "short_name": "Rizzume",
+  "description": "Offline resume builder with LaTeX-quality typesetting.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#e7e3da",
+  "theme_color": "#e7e3da",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
