@@ -1,0 +1,9 @@
+<!doctype html><html><body><pre id="o"></pre><script type="module">
+import { extractLines } from '../src/importer/extract.js';
+import { parseResume } from '../src/importer/parse.js';
+const f=new URLSearchParams(location.search).get('f');
+const blob=await (await fetch('/dev/fixtures/'+f)).blob();
+const file=new File([blob], f);
+try { const lines=await extractLines(file); const {resume,report}=parseResume(lines,f); window.OUT={lines,resume,report}; } catch(e){ window.OUT={error:String(e.stack||e)} }
+document.body.dataset.ready=1;
+</script></body></html>
