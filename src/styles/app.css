@@ -51,6 +51,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
 a { color: inherit; }
 :focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; border-radius: 4px; }
 .ui-ico { flex: none; display: block; }
+[hidden] { display: none !important; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
 /* ---------- buttons ---------- */
@@ -483,3 +484,49 @@ input[type='range'] { accent-color: var(--ember); width: 140px; }
 .h1-reveal > span:nth-child(2) > i { animation-delay: .12s; }
 @keyframes rise { to { transform: none; } }
 .fade-in { opacity: 0; transform: translateY(12px); animation: setType .8s var(--d, .5s) var(--ease) forwards; }
+
+/* ============================================================
+   Import old resume
+   ============================================================ */
+.scrim.closing { opacity: 0; transition: opacity .18s; }
+.modal.imp { width: min(940px, 100%); padding: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 300px); position: relative; overflow: hidden; }
+.imp-x { position: absolute; top: 12px; right: 12px; z-index: 2; }
+.imp-left { padding: 32px 32px 28px; min-height: 480px; display: flex; flex-direction: column; }
+.imp-left h2 { font-family: var(--display); font-weight: 400; font-size: 34px; margin: 0 0 8px; line-height: 1.05; }
+.imp-sub { margin: 0 0 22px; color: var(--ink-2); }
+.drop { flex: 1; min-height: 240px; display: grid; place-content: center; justify-items: center; gap: 6px; text-align: center; border: 1.5px dashed var(--line); border-radius: 14px; cursor: pointer; color: var(--ink-2); transition: border-color .2s, background .2s, transform .2s var(--ease); }
+.drop b { color: var(--ink); font-size: 17px; }
+.drop-ico { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--ember-wash); color: var(--ember-ink); margin-bottom: 8px; transition: transform .3s var(--ease); }
+.drop:hover, .drop.over, .drop:focus-visible { border-color: var(--ember); background: color-mix(in srgb, var(--ember) 5%, transparent); }
+.drop.over { transform: scale(1.01); }
+.drop.over .drop-ico { transform: translateY(-4px) scale(1.08); }
+.imp-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; flex: 1; align-content: start; }
+.imp-steps li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; align-items: start; font-size: 14.5px; animation: stepIn .35s var(--ease); }
+.imp-steps .tick { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid var(--line); margin-top: 1px; font-size: 12px; font-weight: 700; }
+.imp-steps li.run .tick { border-color: var(--ember); border-right-color: transparent; animation: spin .8s linear infinite; }
+.imp-steps li.done .tick { background: var(--ink); border-color: var(--ink); color: var(--desk); }
+.imp-steps li.warn .tick { background: var(--ember); border-color: var(--ember); color: #fff; }
+.imp-steps li.warn { color: var(--ink-2); }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes stepIn { from { opacity: 0; transform: translateX(-8px); } }
+.imp-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.imp-right { background: var(--desk); display: grid; place-items: center; padding: 28px; border-left: 1px solid var(--line-2); }
+.imp-paper { position: relative; width: 100%; aspect-ratio: 210 / 297; background: #fff; border-radius: 2px; box-shadow: var(--paper-shadow); overflow: hidden; }
+.imp-paper .sheet { position: absolute; top: 0; left: 0; transform-origin: 0 0; }
+.imp-paper.ready .sheet .r-head, .imp-paper.ready .sheet .r-sec { opacity: 0; animation: setType .6s var(--ease) forwards; }
+.imp-paper.ready .sheet .r-sec:nth-child(2) { animation-delay: .08s; } .imp-paper.ready .sheet .r-sec:nth-child(3) { animation-delay: .16s; }
+.imp-paper.ready .sheet .r-sec:nth-child(4) { animation-delay: .24s; } .imp-paper.ready .sheet .r-sec:nth-child(5) { animation-delay: .32s; }
+.imp-paper.ready .sheet .r-sec:nth-child(6) { animation-delay: .4s; } .imp-paper.ready .sheet .r-sec:nth-child(7) { animation-delay: .48s; }
+.imp-paper.ready .sheet .r-sec:nth-child(n+8) { animation-delay: .56s; }
+.imp-ghost { position: absolute; inset: 9% 9%; display: grid; gap: 7%; align-content: start; }
+.imp-ghost i { height: 5px; border-radius: 3px; background: #ece8e0; }
+.imp-ghost i:nth-child(1) { width: 55%; height: 10px; } .imp-ghost i:nth-child(3n) { width: 70%; } .imp-ghost i:nth-child(4n) { width: 85%; }
+.imp-paper.reading .imp-ghost i { background: linear-gradient(90deg, #ece8e0 0%, #f8e2d6 50%, #ece8e0 100%); background-size: 200% 100%; animation: shimmer 1.1s linear infinite; }
+.imp-paper.ready .imp-ghost { display: none; }
+@keyframes shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+.dropzone-page.over::after { content: 'Drop to import your resume'; position: fixed; inset: 12px; z-index: 50; border: 2px dashed var(--ember); border-radius: 18px; background: color-mix(in srgb, var(--desk) 88%, transparent); display: grid; place-items: center; font-family: var(--display); font-size: 34px; color: var(--ember-ink); pointer-events: none; }
+@media (max-width: 760px) { .modal.imp { grid-template-columns: 1fr; } .imp-right { display: none; } .imp-left { min-height: 420px; padding: 24px 20px; } }
+.linkish { background: none; border: 0; padding: 0; font: inherit; color: var(--ink-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line); cursor: pointer; }
+.linkish:hover { color: var(--ember-ink); text-decoration-color: currentColor; }
+.morph-cap.on .morph-cta { pointer-events: auto; }
+.morph-cta { margin-top: 26px; }

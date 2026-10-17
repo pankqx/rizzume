@@ -4,6 +4,7 @@ import { fit } from '../fit.js';
 import * as store from '../store.js';
 import { ui } from '../icons.js';
 import { mountMorph, morphHTML } from './morph.js';
+import { openImport } from '../importer/ui.js';
 
 export function openSample() {
   const r = cloneResume(sampleResume(), { name: 'Sample — Software Developer' });
@@ -29,9 +30,9 @@ export function renderLanding(app) {
         <p class="lede fade-in" style="--d:.55s">Write straight onto the page. Rizzume sets it in the same type as LaTeX, keeps it to one tidy page, and hands you a real PDF. No account, no upload, works offline.</p>
         <div class="hero-cta fade-in" style="--d:.7s">
           <a class="btn primary lg" href="#/resumes" data-start>Start building</a>
-          <button class="btn lg" data-sample>Open the sample</button>
+          <button class="btn lg" data-import>${ui('upload', 18)} Import my old resume</button>
         </div>
-        <p class="hero-note fade-in" style="--d:.85s">Free and open source. Your resumes never leave this browser.</p>
+        <p class="hero-note fade-in" style="--d:.85s">Free and open source. Your resumes never leave this browser. <button class="linkish" data-sample>Or open the sample</button></p>
       </div>
       <div class="hero-stage" aria-hidden="true"><div class="stage-sheet" id="stage"></div></div>
     </header>
@@ -85,6 +86,7 @@ export function renderLanding(app) {
   </div>`;
 
   app.querySelectorAll('[data-sample]').forEach((b) => (b.onclick = openSample));
+  app.querySelectorAll('[data-import]').forEach((b) => (b.onclick = () => openImport()));
 
   // ---- Hero: the page sets itself, then an editor's mark fixes a weak verb ----
   const demo = sampleResume();

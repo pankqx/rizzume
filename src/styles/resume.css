@@ -57,7 +57,7 @@
 /* ---------- sections ---------- */
 .r-sec { margin-top: calc(9 * var(--gap)); }
 .r-h {
-  font-size: 1.2em; line-height: 1; font-weight: 700; margin: 0 0 calc(-2.1 * var(--gap));
+  font-size: 1.2em; line-height: 1; font-weight: 700; margin: 0 0 max(-2.1pt, calc(-2.1pt + (var(--k) - 1) * 4pt));
   padding-bottom: calc(5 * var(--gap)); border-bottom: 0.4pt solid #000;
 }
 .r-p, .r-line, .r-btext { text-align: justify; hyphens: auto; -webkit-hyphens: auto; word-spacing: -0.08em; }

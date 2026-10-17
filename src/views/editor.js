@@ -7,6 +7,7 @@ import { saveBlob, fileBase } from '../files.js';
 const downloadPdf = (r) => import('../pdf.js').then((m) => m.downloadPdf(r));
 import { toTex } from '../tex.js';
 import { openReveal } from '../reveal.js';
+import { openImport } from '../importer/ui.js';
 import { ui } from '../icons.js';
 import { h, esc, menu, toast, ask } from '../ui.js';
 import { tailorCopy, importJsonFile } from './library.js';
@@ -736,7 +737,8 @@ export function renderEditor(app, id) {
   $('[data-more]').onclick = (e) =>
     menu(e.currentTarget, [
       { label: 'Tailor a copy for a job…', icon: ui('copy', 16), onClick: async () => { const c = await tailorCopy(r); if (c) { location.hash = `#/edit/${c.id}`; toast(`Now editing “${c.name}”`); } } },
-      { label: 'Import a backup…', icon: ui('upload', 16), onClick: async () => { const n = await importJsonFile(); if (n) location.hash = `#/edit/${n.id}`; } },
+      { label: 'Import an old resume…', icon: ui('upload', 16), onClick: () => openImport() },
+      { label: 'Restore a backup…', icon: ui('download', 16), onClick: async () => { const n = await importJsonFile(); if (n) location.hash = `#/edit/${n.id}`; } },
       'sep',
       { label: 'Keyboard shortcuts', icon: ui('pen', 16), onClick: shortcuts },
       { label: 'All resumes', icon: ui('back', 16), onClick: () => (location.hash = '#/resumes') },

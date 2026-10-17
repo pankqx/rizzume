@@ -11,8 +11,8 @@ function params(u, base) {
     k = 1 + Math.max(u, -0.5) * 0.6;
     fs = base + Math.min(0, u + 0.5) * 2 * 1.25;
   } else {
-    k = 1 + (Math.min(u, 0.6) / 0.6) * 0.55;
-    fs = base + (Math.max(0, u - 0.6) / 0.4) * 0.7;
+    k = 1 + (Math.min(u, 0.6) / 0.6) * 0.35;
+    fs = base + (Math.max(0, u - 0.6) / 0.4) * 0.8;
   }
   return { fs: +fs.toFixed(3), k: +k.toFixed(3) };
 }

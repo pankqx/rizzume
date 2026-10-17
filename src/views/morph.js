@@ -156,7 +156,7 @@ export const morphHTML = `
       <div class="morph-caps">
         <div class="morph-cap on"><h2>The resume you have.</h2><p>Calibri, shaded headings, an objective from 2009 and a second page nobody reads.</p></div>
         <div class="morph-cap"><h2>Drop it in.</h2><p>Rizzume reads your old PDF or Word file, keeps every word, and resets each line in its proper place.</p></div>
-        <div class="morph-cap"><h2>The resume you send.</h2><p>One page, typeset like LaTeX, rules where they belong. Same you, better first impression.</p></div>
+        <div class="morph-cap"><h2>The resume you send.</h2><p>One page, typeset like LaTeX, rules where they belong. Same you, better first impression.</p><button class="btn primary lg morph-cta" data-import>Import my old resume</button></div>
       </div>
     </div>
     <div class="morph-stage" aria-hidden="true">

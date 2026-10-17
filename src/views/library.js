@@ -5,10 +5,14 @@ import { fit } from '../fit.js';
 import { ui } from '../icons.js';
 import { h, esc, menu, modal, ask, toast, timeAgo, pickFile } from '../ui.js';
 import { saveBlob } from '../files.js';
+import { openImport, chooseAndImport } from '../importer/ui.js';
 
 export async function importJsonFile() {
   const f = await pickFile('.json,application/json');
   if (!f) return null;
+  return importJsonFromFile(f);
+}
+export async function importJsonFromFile(f) {
   try {
     const data = JSON.parse(await f.text());
     const list = Array.isArray(data) ? data : data.resumes ? data.resumes : [data];
@@ -33,13 +37,15 @@ export function newResumeDialog() {
     <div class="choice-grid">
       <button class="choice" data-c="blank">${ui('file', 22)}<div><b>Blank page</b><span>The usual sections, ready to fill in.</span></div></button>
       <button class="choice" data-c="sample">${ui('pen', 22)}<div><b>Start from the sample</b><span>A finished example to edit over.</span></div></button>
-      <button class="choice" data-c="import">${ui('upload', 22)}<div><b>Import a backup</b><span>A .json file exported from Rizzume.</span></div></button>
+      <button class="choice" data-c="old">${ui('upload', 22)}<div><b>Import my old resume</b><span>PDF, Word, LaTeX or text. We pull out every section for you.</span></div></button>
+      <button class="choice" data-c="import">${ui('download', 22)}<div><b>Restore a backup</b><span>A .json file exported from Rizzume.</span></div></button>
     </div>`,
     {
       onMount(m, close) {
         m.querySelectorAll('[data-c]').forEach((b) =>
           (b.onclick = async () => {
             close();
+            if (b.dataset.c === 'old') return openImport();
             let r;
             if (b.dataset.c === 'blank') r = blankResume('Untitled resume');
             if (b.dataset.c === 'sample') r = cloneResume(sampleResume(), { name: 'Sample — Software Developer' });
@@ -76,13 +82,28 @@ export function exportAll() {
 }
 
 export function renderLibrary(app) {
+  let depth = 0;
+  const onEnter = (e) => { if (!e.dataTransfer?.types.includes('Files') || document.querySelector('.imp')) return; e.preventDefault(); depth++; app.classList.add('dropzone-page', 'over'); };
+  const onOver = (e) => { if (e.dataTransfer?.types.includes('Files')) e.preventDefault(); };
+  const onLeave = () => { if (--depth <= 0) { depth = 0; app.classList.remove('over'); } };
+  const onDrop = (e) => {
+    if (document.querySelector('.imp')) return;
+    e.preventDefault(); depth = 0; app.classList.remove('over');
+    const f = e.dataTransfer.files[0];
+    if (!f) return;
+    if (/\.json$/i.test(f.name)) importJsonFromFile(f).then((ok) => ok && draw());
+    else openImport(f);
+  };
+  addEventListener('dragenter', onEnter); addEventListener('dragover', onOver); addEventListener('dragleave', onLeave); addEventListener('drop', onDrop);
+  const cleanupDnD = () => { removeEventListener('dragenter', onEnter); removeEventListener('dragover', onOver); removeEventListener('dragleave', onLeave); removeEventListener('drop', onDrop); app.classList.remove('dropzone-page', 'over'); };
   const draw = () => {
     const list = store.list();
     app.innerHTML = `
     <nav class="nav">
       <a class="wordmark" href="#/" aria-label="Rizzume home">Rizz<i>ume</i></a>
       <div class="nav-actions">
-        <button class="btn ghost" data-import>${ui('upload', 16)}<span class="hide-sm">Import</span></button>
+        <button class="btn ghost" data-import>${ui('upload', 16)}<span class="hide-sm">Import old resume</span></button>
+        <button class="btn ghost hide-sm" data-restore>Restore backup</button>
         ${list.length ? `<button class="btn ghost" data-backup>${ui('download', 16)}<span class="hide-sm">Back up all</span></button>` : ''}
         <button class="btn primary" data-new>${ui('plus', 16)} New resume</button>
       </div>
@@ -126,10 +147,12 @@ export function renderLibrary(app) {
         ], { align: 'right' });
     }
     app.querySelectorAll('[data-new]').forEach((b) => (b.onclick = newResumeDialog));
-    app.querySelector('[data-import]').onclick = async () => { if (await importJsonFile()) draw(); };
+    app.querySelector('[data-import]').onclick = () => openImport();
+    app.querySelector('[data-restore]').onclick = async () => { if (await importJsonFile()) draw(); };
     const bk = app.querySelector('[data-backup]');
     if (bk) bk.onclick = exportAll;
     if (!list.length && !draw.prompted) { draw.prompted = true; newResumeDialog(); }
   };
   draw();
+  return cleanupDnD;
 }
