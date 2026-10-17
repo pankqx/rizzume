@@ -6,6 +6,7 @@ import { proofread, matchJD } from '../coach.js';
 import { saveBlob, fileBase } from '../files.js';
 const downloadPdf = (r) => import('../pdf.js').then((m) => m.downloadPdf(r));
 import { toTex } from '../tex.js';
+import { openReveal } from '../reveal.js';
 import { ui } from '../icons.js';
 import { h, esc, menu, toast, ask } from '../ui.js';
 import { tailorCopy, importJsonFile } from './library.js';
@@ -720,24 +721,18 @@ export function renderEditor(app, id) {
   themeBtn.onclick = () => { store.setSetting('theme', drawTheme() ? 'light' : 'dark'); applyTheme(); drawTheme(); };
 
   async function doPdf() {
-    const ov = h(`<div class="exporting" role="alert" aria-busy="true"><div class="exporting-card"><div class="press"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><p>Setting your PDF…</p></div></div>`);
-    document.body.appendChild(ov);
-    try {
-      const [name] = await Promise.all([downloadPdf(r), new Promise((res) => setTimeout(res, 900))]);
-      toast(`Downloaded ${name}`);
-    } catch (err) {
-      console.error(err);
-      toast('The PDF couldn’t be made. Try again, or use your browser’s Print → Save as PDF.');
-    } finally { ov.remove(); }
+    commitPending();
+    openReveal(r, {
+      onPdf: () => downloadPdf(r),
+      onTex: doTex,
+      onJson: doJson,
+      onTailor: async () => { const c = await tailorCopy(r); if (c) { location.hash = `#/edit/${c.id}`; toast(`Now editing “${c.name}”`); } },
+    });
   }
+  function commitPending() { hist.push(r); syncUndo(); store.put(r); }
   function doTex() { saveBlob(toTex(r), fileBase(r) + '.tex', 'application/x-tex'); toast(`Downloaded ${fileBase(r)}.tex`); }
   function doJson() { saveBlob(JSON.stringify(r, null, 2), fileBase(r) + '.json', 'application/json'); toast('Backup downloaded'); }
-  $('[data-download]').onclick = (e) =>
-    menu(e.currentTarget, [
-      { label: 'PDF', icon: ui('file', 16), kbd: 'Ctrl P', onClick: doPdf },
-      { label: 'LaTeX source (.tex)', icon: ui('sections', 16), onClick: doTex },
-      { label: 'Backup (.json)', icon: ui('download', 16), onClick: doJson },
-    ], { align: 'right' });
+  $('[data-download]').onclick = doPdf;
   $('[data-more]').onclick = (e) =>
     menu(e.currentTarget, [
       { label: 'Tailor a copy for a job…', icon: ui('copy', 16), onClick: async () => { const c = await tailorCopy(r); if (c) { location.hash = `#/edit/${c.id}`; toast(`Now editing “${c.name}”`); } } },
