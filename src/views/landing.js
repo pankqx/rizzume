@@ -3,6 +3,7 @@ import { sheetEl } from '../render.js';
 import { fit } from '../fit.js';
 import * as store from '../store.js';
 import { ui } from '../icons.js';
+import { mountMorph, morphHTML } from './morph.js';
 
 export function openSample() {
   const r = cloneResume(sampleResume(), { name: 'Sample — Software Developer' });
@@ -24,16 +25,18 @@ export function renderLanding(app) {
 
     <header class="hero">
       <div>
-        <h1>Resumes with rizz.</h1>
-        <p class="lede">Write straight onto the page. Rizzume sets it in the same type as LaTeX, keeps it to one tidy page, and hands you a real PDF. No account, no upload, works offline.</p>
-        <div class="hero-cta">
+        <h1 class="h1-reveal"><span><i>Resumes</i></span> <span><i>with rizz.</i></span></h1>
+        <p class="lede fade-in" style="--d:.55s">Write straight onto the page. Rizzume sets it in the same type as LaTeX, keeps it to one tidy page, and hands you a real PDF. No account, no upload, works offline.</p>
+        <div class="hero-cta fade-in" style="--d:.7s">
           <a class="btn primary lg" href="#/resumes" data-start>Start building</a>
           <button class="btn lg" data-sample>Open the sample</button>
         </div>
-        <p class="hero-note">Free and open source. Your resumes never leave this browser.</p>
+        <p class="hero-note fade-in" style="--d:.85s">Free and open source. Your resumes never leave this browser.</p>
       </div>
       <div class="hero-stage" aria-hidden="true"><div class="stage-sheet" id="stage"></div></div>
     </header>
+
+    ${morphHTML}
 
     <section class="band">
       <h2>From blank page to PDF in three moves.</h2>
@@ -164,5 +167,6 @@ export function renderLanding(app) {
     for (const s of fd.sections) if (s.kind === 'entries') for (const it of [...s.items].reverse()) if (it.bullets.length > 1) { it.bullets.pop(); added = Math.max(0, added - 1); return repaint(); }
   };
 
-  return () => timers.forEach(clearTimeout);
+  const unmorph = mountMorph(app.querySelector('.morph'));
+  return () => { timers.forEach(clearTimeout); unmorph(); };
 }
