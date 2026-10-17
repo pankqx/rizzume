@@ -122,7 +122,7 @@ export function openImport(file) {
     const sh = sheetEl(resume);
     paper.appendChild(sh);
     fit(sh, resume);
-    sh.style.transform = `scale(${paper.clientWidth / 793.7})`;
+    sh.style.zoom = paper.clientWidth / 793.7;
     paper.classList.remove('reading');
     paper.classList.add('ready');
     actions.hidden = false;

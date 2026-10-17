@@ -22,7 +22,11 @@ function apply(sheet, p) {
   sheet.style.setProperty('--k', p.k);
 }
 
-const height = (sheet) => sheet.querySelector('.sheet-body').offsetHeight;
+// Measured through getBoundingClientRect so it is correct whatever zoom the sheet is shown at.
+const height = (sheet) => {
+  const k = sheet.getBoundingClientRect().width / (595.28 * PX_PER_PT) || 1;
+  return sheet.querySelector('.sheet-body').getBoundingClientRect().height / k;
+};
 
 export function fit(sheet, r) {
   const base = (TEMPLATES[r.template] || TEMPLATES.classic).base;

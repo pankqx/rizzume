@@ -137,9 +137,9 @@ export function renderEditor(app, id) {
   function applyZoom() {
     const avail = desk.clientWidth - (innerWidth < 920 ? 32 : 144);
     const z = zoom === 'fit' ? Math.max(0.3, Math.min(1.15, avail / PAGE_W)) : zoom;
-    sheet.style.transform = `scale(${z})`;
+    sheet.style.zoom = z;
     wrap.style.width = PAGE_W * z + 'px';
-    wrap.style.height = sheet.offsetHeight * z + 'px';
+    wrap.style.height = sheet.getBoundingClientRect().height + 'px';
     wrap.dataset.zoom = z;
     $('.zoom span').textContent = Math.round(z * 100) + '%';
   }
@@ -379,7 +379,6 @@ export function renderEditor(app, id) {
     if (s.kind === 'lines') { s.rows.push({ id: uid(), label: '', value: '' }); return { path: `sections.${si}.rows.${s.rows.length - 1}.label` }; }
     if (s.kind === 'entries') {
       const e = blankEntry(s.layout);
-      if (s.type === 'projects') e.right = 'Code';
       const firstBulletsOnly = s.items.findIndex((x) => x.bulletsOnly);
       if (firstBulletsOnly >= 0) s.items.splice(firstBulletsOnly, 0, e); else s.items.push(e);
       return { path: `sections.${si}.items.${s.items.indexOf(e)}.title` };
@@ -627,7 +626,7 @@ export function renderEditor(app, id) {
       const sh = sheetEl({ ...r, template: k });
       th.appendChild(sh);
       fit(sh, { ...r, template: k });
-      requestAnimationFrame(() => (sh.style.transform = `scale(${th.clientWidth / PAGE_W})`));
+      requestAnimationFrame(() => (sh.style.zoom = th.clientWidth / PAGE_W));
       b.onclick = () => { r.template = k; commit(); drawDesign(); };
     });
     const af = panelBody.querySelector('#af');

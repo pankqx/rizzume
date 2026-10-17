@@ -98,7 +98,7 @@ a { color: inherit; }
 .hero-note { margin-top: 20px; font-size: 13.5px; color: var(--ink-3); }
 .hero-stage { position: relative; display: grid; place-items: center; min-height: 560px; }
 .stage-sheet { --s: .5; position: relative; width: calc(793.7px * var(--s)); height: calc(1122.5px * var(--s)); }
-.stage-sheet .sheet { position: absolute; top: 0; left: 0; transform: scale(var(--s)); transform-origin: 0 0; box-shadow: var(--paper-shadow); }
+.stage-sheet .sheet { position: absolute; top: 0; left: 0; zoom: var(--s); box-shadow: var(--paper-shadow); }
 .stage-sheet .sheet .r-sec, .stage-sheet .sheet .r-head { opacity: 0; transform: translateY(14px); }
 .stage-sheet.run .sheet .r-head, .stage-sheet.run .sheet .r-sec { animation: setType .7s var(--ease) forwards; }
 .proof-demo { position: absolute; pointer-events: none; }
@@ -110,7 +110,7 @@ a { color: inherit; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
 
 .band { max-width: 1280px; margin: 0 auto; padding: clamp(48px, 7vw, 96px) clamp(16px, 4vw, 48px); }
-.band h2 { font-family: var(--display); font-weight: 400; font-size: clamp(34px, 4.4vw, 56px); line-height: 1.02; letter-spacing: -.02em; margin: 0 0 16px; max-width: 16em; }
+.band h2:not(.r-h) { font-family: var(--display); font-weight: 400; font-size: clamp(34px, 4.4vw, 56px); line-height: 1.02; letter-spacing: -.02em; margin: 0 0 16px; max-width: 16em; }
 .band > p { color: var(--ink-2); max-width: 36em; font-size: 17px; margin: 0 0 40px; }
 .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--line); }
 .step { padding: 28px 28px 8px 0; }
@@ -122,7 +122,7 @@ a { color: inherit; }
 .fitdemo { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(24px, 5vw, 72px); align-items: center; }
 .fitdemo-stage { display: grid; place-items: center; background: color-mix(in srgb, var(--ink) 4%, transparent); border-radius: 16px; padding: 32px 16px; }
 .fitdemo-sheet { --s: .4; width: calc(793.7px * var(--s)); height: calc(1122.5px * var(--s)); position: relative; }
-.fitdemo-sheet .sheet { transform: scale(var(--s)); transform-origin: 0 0; position: absolute; box-shadow: var(--paper-shadow); transition: none; }
+.fitdemo-sheet .sheet { zoom: var(--s); position: absolute; box-shadow: var(--paper-shadow); transition: none; }
 .fitdemo-controls { display: flex; gap: 8px; flex-wrap: wrap; margin: 24px 0 16px; }
 .meter { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
 .meter-bar { width: 160px; height: 6px; border-radius: 3px; background: var(--line); overflow: hidden; }
@@ -169,7 +169,7 @@ a { color: inherit; }
 .scrim { position: fixed; inset: 0; z-index: 70; background: rgba(20, 18, 14, .32); display: grid; place-items: center; padding: 16px; animation: fade .2s; }
 @keyframes fade { from { opacity: 0; } }
 .modal { width: min(520px, 100%); background: var(--raised); border-radius: 14px; box-shadow: var(--pop-shadow); padding: 24px; animation: pop .2s var(--ease); max-height: calc(100vh - 32px); overflow: auto; }
-.modal h2 { font-family: var(--display); font-weight: 400; font-size: 30px; margin: 0 0 6px; line-height: 1.1; }
+.modal h2:not(.r-h) { font-family: var(--display); font-weight: 400; font-size: 30px; margin: 0 0 6px; line-height: 1.1; }
 .modal > p { margin: 0 0 20px; color: var(--ink-2); }
 .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 22px; }
 .choice-grid { display: grid; gap: 10px; }
@@ -452,7 +452,7 @@ input[type='range'] { accent-color: var(--ember); width: 140px; }
   transform: rotate(var(--tilt));
   box-shadow: var(--paper-shadow), 0 30px 80px -20px rgba(226, 83, 31, calc(var(--glow) * .45));
 }
-.morph-paper > .olddoc, .morph-paper > .morph-new { position: absolute; top: 0; left: 0; width: 793.7px; height: 1122.5px; transform: scale(var(--s)); transform-origin: 0 0; }
+.morph-paper > .olddoc, .morph-paper > .morph-new { position: absolute; top: 0; left: 0; width: 793.7px; height: 1122.5px; zoom: var(--s); }
 .morph-paper .morph-new { background: transparent; min-height: 0; }
 .morph-paper [data-piece], .morph-new .r-name, .morph-new .r-title, .morph-new .r-c, .morph-new .r-h, .morph-new .r-p, .morph-new .r-line, .morph-new .r-row, .morph-new li { transform-origin: 0 0; will-change: transform, opacity; }
 .olddoc { box-sizing: border-box; padding: 70px 82px; font-family: 'Carlito', Calibri, 'Segoe UI', Arial, sans-serif; font-size: 14px; line-height: 1.22; color: #000; }

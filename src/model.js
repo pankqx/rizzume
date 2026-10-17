@@ -32,7 +32,6 @@ export function newSection(type) {
     s.layout = p.layout;
     s.tight = !!p.tight;
     s.items = [blankEntry(p.layout)];
-    if (type === 'projects') s.items[0].right = 'Code';
   }
   return s;
 }

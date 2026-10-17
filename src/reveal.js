@@ -51,7 +51,7 @@ export function openReveal(r, { onPdf, onTex, onJson, onTailor } = {}) {
     const capH = innerWidth < 700 ? 230 : 200;
     const s = Math.min((innerHeight - capH - 48) / PAGE_H, (innerWidth - 40) / PAGE_W, 0.9);
     el.style.setProperty('--ps', s);
-    sheet.style.transform = `scale(${s})`;
+    sheet.style.zoom = s;
   };
   size();
   addEventListener('resize', size);

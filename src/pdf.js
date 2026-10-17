@@ -66,6 +66,8 @@ export async function buildPdf(resume) {
   document.body.appendChild(host);
   const sheet = sheetEl(resume, { editable: false });
   host.appendChild(sheet);
+  // Lay out narrower than the screen on phones: some mobile browsers re-wrap text in blocks wider than the viewport.
+  if (innerWidth < 840) sheet.style.zoom = Math.min(1, (innerWidth - 24) / 793.7);
   await document.fonts.ready;
   fit(sheet, resume);
   await new Promise((r) => requestAnimationFrame(r));
@@ -82,6 +84,9 @@ export async function buildPdf(resume) {
   const font = async (key) => (fonts[key] ||= doc.embedFont(await getBytes(FONT_FILES[key]), { subset: false }));
 
   const S = sheet.getBoundingClientRect();
+  const K = S.width / 793.7 || 1;
+  // Rect in unzoomed sheet coordinates (px), relative to the sheet's top-left.
+  const U = (r) => ({ left: (r.left - S.left) / K, right: (r.right - S.left) / K, top: (r.top - S.top) / K, bottom: (r.bottom - S.top) / K, width: r.width / K, height: r.height / K });
   const pages = [];
   const pageFor = (topPx) => {
     const i = Math.max(0, Math.floor((topPx - MARGIN_PX) / AVAIL_H));
@@ -89,7 +94,7 @@ export async function buildPdf(resume) {
     return { page: pages[i], shift: i * AVAIL_H };
   };
   pageFor(0);
-  const X = (px) => (px - S.left) * PT;
+  const X = (px) => px * PT;
 
   // 2. Text, word by word.
   const walker = document.createTreeWalker(sheet, NodeFilter.SHOW_TEXT);
@@ -116,7 +121,7 @@ export async function buildPdf(resume) {
       if (!rects.length) continue;
       const trail = /\s/.test(text[end] || '') ? ' ' : '';
       if (rects.length === 1) {
-        jobs.push({ str: m[0] + trail, rect: rects[0], key, sizePx, ratio, color, upper });
+        jobs.push({ str: m[0] + trail, rect: U(rects[0]), key, sizePx, ratio, color, upper });
       } else {
         // Word hyphenated across lines: find the break.
         let cut = start + 1;
@@ -128,16 +133,16 @@ export async function buildPdf(resume) {
           if (r && Math.abs(r.top - firstTop) > 2) { cut = i; break; }
         }
         const a = text.slice(start, cut), b = text.slice(cut, end);
-        jobs.push({ str: a.endsWith('-') ? a : a + '-', rect: rects[0], key, sizePx, ratio, color, upper });
+        jobs.push({ str: a.endsWith('-') ? a : a + '-', rect: U(rects[0]), key, sizePx, ratio, color, upper });
         range.setStart(node, cut); range.setEnd(node, end);
         const rb = [...range.getClientRects()].filter((r) => r.width > 0)[0] || rects[rects.length - 1];
-        jobs.push({ str: b + trail, rect: rb, key, sizePx, ratio, color, upper });
+        jobs.push({ str: b + trail, rect: U(rb), key, sizePx, ratio, color, upper });
       }
     }
   }
   for (const j of jobs) {
     const f = await font(j.key);
-    const top = j.rect.top - S.top;
+    const top = j.rect.top;
     const { page, shift } = pageFor(top);
     const baseline = top + j.ratio * j.sizePx - shift;
     let str = j.upper ? j.str.toUpperCase() : j.str;
@@ -151,23 +156,24 @@ export async function buildPdf(resume) {
     const cs = getComputedStyle(el);
     const bw = parseFloat(cs.borderBottomWidth);
     if (bw > 0 && cs.borderBottomStyle !== 'none') {
-      const r = el.getBoundingClientRect();
-      const top = r.bottom - S.top - bw;
+      const r = U(el.getBoundingClientRect());
+      const top = r.bottom - bw;
       const { page, shift } = pageFor(top);
       page.drawRectangle({ x: X(r.left), y: PAGE_H - (top - shift + bw) * PT, width: r.width * PT, height: bw * PT, color: parseColor(cs.borderBottomColor) });
     }
   }
   for (const svg of sheet.querySelectorAll('svg[data-fa]')) {
     const ico = FA[svg.dataset.fa];
-    const r = svg.getBoundingClientRect();
-    const top = r.top - S.top;
+    const r = U(svg.getBoundingClientRect());
+    const top = r.top;
     const { page, shift } = pageFor(top);
     const scale = (r.height / ico.h) * PT;
     page.drawSvgPath(ico.d, { x: X(r.left), y: PAGE_H - (top - shift) * PT, scale, color: parseColor(getComputedStyle(svg).fill) });
   }
   for (const a of sheet.querySelectorAll('a[href]')) {
-    for (const r of a.getClientRects()) {
-      const top = r.top - S.top;
+    for (const rr of a.getClientRects()) {
+      const r = U(rr);
+      const top = r.top;
       const { page, shift } = pageFor(top);
       const y1 = PAGE_H - (top - shift + r.height) * PT, y2 = PAGE_H - (top - shift) * PT;
       const annot = doc.context.obj({

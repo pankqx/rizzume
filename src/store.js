@@ -20,11 +20,24 @@ function safeSet() {
   }
 }
 
+// Older builds used a different sample person; rename it wherever it was saved.
+function migrateSample(r) {
+  const p = r.personal;
+  if (/^ananya rao$/i.test(p.name.trim())) {
+    p.name = 'PRISHA PANKAJ';
+    if (/ananya/i.test(p.email)) p.email = 'prisha.pankaj@email.com';
+    for (const k of ['linkedin', 'github']) if (/ananya/i.test(p[k])) p[k] = 'prishapankaj';
+    for (const s of r.sections) if (s.items) for (const e of s.items) if (/ananya/i.test(e.url)) e.url = e.url.replace(/ananyarao/gi, 'prishapankaj');
+    if (/ananya/i.test(r.name)) r.name = r.name.replace(/ananya rao/gi, 'Prisha Pankaj');
+  }
+  return r;
+}
+
 export function load() {
   const s = safeGet();
   if (s && s.resumes) {
     state = { ...state, ...s, settings: { ...state.settings, ...(s.settings || {}) } };
-    for (const id in state.resumes) state.resumes[id] = normalize(state.resumes[id]);
+    for (const id in state.resumes) state.resumes[id] = migrateSample(normalize(state.resumes[id]));
   }
   return state;
 }

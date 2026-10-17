@@ -123,7 +123,7 @@ export function renderLibrary(app) {
       const sh = sheetEl(r);
       thumb.appendChild(sh);
       fit(sh, r);
-      const scale = () => (sh.style.transform = `scale(${thumb.clientWidth / 793.7})`);
+      const scale = () => (sh.style.zoom = thumb.clientWidth / 793.7);
       scale();
       new ResizeObserver(scale).observe(thumb);
       card.querySelector('.icon-btn').onclick = (e) =>
