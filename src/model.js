@@ -58,12 +58,12 @@ export function sampleResume() {
   const r = blankResume('Sample — Software Developer');
   r.target = 'Software Developer';
   r.personal = {
-    name: 'ANANYA RAO',
+    name: 'PRISHA PANKAJ',
     title: 'Software Developer | Backend & Cloud',
-    email: 'ananya.rao@email.com',
+    email: 'prisha.pankaj@email.com',
     phone: '+91 98450 12345',
-    linkedin: 'ananyarao',
-    github: 'ananyarao',
+    linkedin: 'prishapankaj',
+    github: 'prishapankaj',
     website: '',
     location: '',
   };
@@ -107,7 +107,7 @@ export function sampleResume() {
         E({
           title: 'Ledgerly — Personal Finance Tracker',
           right: 'Code',
-          url: 'https://github.com/ananyarao',
+          url: 'https://github.com/prishapankaj',
           bullets: [
             'Full-stack app in React and Express with PostgreSQL, featuring CSV import, budgets and monthly reports.',
             'Deployed with Docker on AWS EC2 behind Nginx; CI pipeline runs tests and lint on every pull request.',
@@ -116,7 +116,7 @@ export function sampleResume() {
         E({
           title: 'Railwatch — Train Delay Notifier',
           right: 'Code',
-          url: 'https://github.com/ananyarao',
+          url: 'https://github.com/prishapankaj',
           bullets: ['Serverless Python bot on AWS Lambda that alerts 300+ daily commuters on Telegram when their train runs late.'],
         }),
       ],

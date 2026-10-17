@@ -34,6 +34,8 @@
   text-rendering: geometricPrecision;
   -webkit-font-smoothing: antialiased;
   overflow-wrap: break-word;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
 }
 .sheet *, .sheet *::before, .sheet *::after { box-sizing: border-box; }
 .sheet a { color: inherit; text-decoration: none; }
@@ -145,3 +147,5 @@
 ::highlight(jd-hit) { background-color: #ffe58a; color: inherit; }
 .tpl-compact .r-k-entries:has(.r-entry:last-child > .r-ul) + .r-sec { margin-top: calc(9 * var(--gap)); }
 .tpl-modern .r-k-entries:has(.r-entry:last-child > .r-ul) + .r-sec { margin-top: calc(14 * var(--gap)); }
+/* Android Chrome "font boosting" ignores text-size-adjust in some layouts; a max-height opts a block out. */
+.sheet, .sheet div, .sheet p, .sheet li, .sheet span, .sheet section { max-height: 1000000px; }
