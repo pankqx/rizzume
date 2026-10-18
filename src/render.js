@@ -78,7 +78,7 @@ export function renderResume(r, { editable = false } = {}) {
           const right = it.right || E ? link(it.url, `${icon}${ed(ip + '.right', it.right, L === 'role' ? 'Date' : 'Year')}`) : '';
           if (hasHead) {
             if (L === 'school') {
-              head = `<div class="r-row"><span class="r-t">${ed(ip + '.title', it.title, 'University or college')}</span><span class="r-r r-it">${right}</span></div>
+              head = `<div class="r-row"><span class="r-t">${ed(ip + '.title', it.title, 'University or college')}</span><span class="r-r r-b">${right}</span></div>
               <div class="r-row r-sub"><span>${ed(ip + '.subtitle', it.subtitle, 'Degree and major')}</span><span class="r-r r-b">${ed(ip + '.subRight', it.subRight, 'CGPA / %')}</span></div>`;
             } else if (L === 'compact') {
               const det = it.detail || E ? `<span class="r-det"> — ${ed(ip + '.detail', it.detail, 'Issuer')}</span>` : '';

@@ -530,3 +530,62 @@ input[type='range'] { accent-color: var(--ember); width: 140px; }
 .linkish:hover { color: var(--ember-ink); text-decoration-color: currentColor; }
 .morph-cap.on .morph-cta { pointer-events: auto; }
 .morph-cta { margin-top: 26px; }
+
+/* ---------- fit demo: never spills, talks back when full ---------- */
+.fitdemo-stage { position: relative; overflow: hidden; }
+.fitdemo-sheet { overflow: hidden; border-radius: 2px; }
+.fitdemo-sheet.squeeze { animation: squeeze .45s var(--ease); }
+.fitdemo-sheet.breathe { animation: breathe .5s var(--ease); }
+.fitdemo-sheet.shake { animation: shake .45s cubic-bezier(.36, .07, .19, .97); }
+@keyframes squeeze { 30% { transform: scale(1.012, .985); } }
+@keyframes breathe { 40% { transform: scale(.992, 1.012); } }
+@keyframes shake { 15%, 55% { transform: translateX(-7px) rotate(-.6deg); } 35%, 75% { transform: translateX(7px) rotate(.6deg); } }
+.fitdemo-sheet .just-added { animation: justAdded 1.6s var(--ease); border-radius: 2px; }
+@keyframes justAdded { 0%, 30% { background: rgba(226, 83, 31, .22); } 100% { background: transparent; } }
+.fit-bubble {
+  position: absolute; left: 50%; top: 50%; translate: -50% -50%; z-index: 2; min-width: 240px; max-width: calc(100% - 32px);
+  background: var(--ink); color: var(--desk); border-radius: 14px; padding: 16px 18px; text-align: center;
+  box-shadow: var(--pop-shadow);
+}
+.fit-bubble.pop { animation: bubblePop .5s cubic-bezier(.34, 1.56, .64, 1); }
+@keyframes bubblePop { from { opacity: 0; transform: scale(.6) rotate(-4deg); } }
+.fit-bubble .face { margin: 0 0 6px; font: 600 20px/1.2 ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace; color: var(--hl); white-space: pre; }
+.fit-bubble .line { font: 13.5px/1.4 ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace; }
+.fit-bubble .line::after { content: '▍'; animation: blink .7s steps(1) infinite; color: var(--ember); margin-left: 2px; }
+
+/* ---------- bow & paper arrow ---------- */
+.bowband { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(24px, 5vw, 64px); align-items: center; }
+.bow-copy p { color: var(--ink-2); font-size: 17px; margin: 0 0 12px; max-width: 26em; }
+.bow-copy .bow-status { font-family: var(--display); font-style: italic; color: var(--ink); font-size: 22px; min-height: 1.4em; margin: 18px 0 14px; }
+.bow-stage { --tension: 0; position: relative; border-radius: 18px; background: color-mix(in srgb, var(--ink) 4%, transparent); touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none; outline-offset: 4px; }
+.bow-stage.drawing { cursor: grabbing; }
+.bow-stage.thud { animation: thud .3s var(--ease); }
+@keyframes thud { 40% { transform: translateX(3px); } }
+.bow-stage svg { display: block; width: 100%; height: auto; }
+.bow-stage .ground { stroke: var(--line); stroke-width: 2; stroke-dasharray: 2 8; stroke-linecap: round; }
+.bow-stage .bow { fill: none; stroke: var(--ink); stroke-width: 7; stroke-linecap: round; }
+.bow-stage .string { fill: none; stroke: var(--ink-2); stroke-width: 1.6; }
+.bow-stage .shaft { fill: #fff; stroke: var(--ink); stroke-width: 1.3; }
+.bow-stage .fold { stroke: #c9c2b5; stroke-width: 1; stroke-dasharray: 3 3; }
+.bow-stage .tip { fill: #fff; stroke: var(--ink); stroke-width: 1.3; stroke-linejoin: round; }
+.bow-stage .fletch { fill: var(--ember); stroke: var(--ink); stroke-width: 1; stroke-linejoin: round; }
+.bow-stage .target line { stroke: var(--ink-3); stroke-width: 4; stroke-linecap: round; }
+.bow-stage .ring { stroke: var(--ink); stroke-width: 1.5; }
+.bow-stage .r1 { fill: var(--raised); } .bow-stage .r2 { fill: var(--line); } .bow-stage .r3 { fill: var(--raised); } .bow-stage .r4 { fill: var(--ember); }
+.bow-stage .target-label { font: italic 17px var(--display); fill: var(--ink-2); }
+.bow-stage .hint { font: italic 18px var(--display); fill: var(--ember-ink); animation: nudge 1.4s ease-in-out infinite; transition: opacity .3s; }
+.bow-stage .hint.gone { opacity: 0; animation: none; }
+@keyframes nudge { 50% { transform: translateX(-10px); } }
+.bow-stage .page .sheetrect { fill: #fff; stroke: #d9d3c7; }
+.bow-stage .page .ink { fill: #1c1b19; }
+.bow-stage .page .soft { fill: #b8b1a5; }
+.bow-stage .page .rule { stroke: #1c1b19; stroke-width: .8; }
+.bow-stage .page .txt { stroke: #c4bdb0; stroke-width: 2; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; }
+.bow-stage .page.open .txt { animation: drawTxt .5s calc(var(--i) * 40ms) var(--ease) forwards; }
+@keyframes drawTxt { to { stroke-dashoffset: 0; } }
+.bow-stage .stamp-in { opacity: 0; transform: scale(2.4) rotate(-20deg); transform-box: fill-box; transform-origin: center; }
+.bow-stage .page.open .stamp-in { animation: stamp .45s .55s cubic-bezier(.34, 1.56, .64, 1) forwards; }
+@keyframes stamp { to { opacity: 1; transform: scale(1) rotate(-12deg); } }
+.bow-stage .stamp rect { fill: rgba(226, 83, 31, .08); stroke: #e2531f; stroke-width: 2.5; }
+.bow-stage .stamp text { font: 800 17px var(--ui); letter-spacing: .12em; fill: #e2531f; }
+@media (max-width: 920px) { .bowband { grid-template-columns: minmax(0, 1fr); } }

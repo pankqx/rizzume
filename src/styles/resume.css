@@ -64,8 +64,9 @@
 /* ---------- sections ---------- */
 .r-sec { margin-top: calc(9 * var(--gap)); }
 .sheet .r-h {
-  font-size: 1.2em; line-height: 1; font-weight: 700; margin: 0 0 max(-2.1pt, calc(-2.1pt + (var(--k) - 1) * 4pt));
-  padding-bottom: calc(5 * var(--gap)); border-bottom: 0.4pt solid #000;
+  /* Rule sits closer under the heading, with clear air before the text that follows. */
+  font-size: 1.2em; line-height: 1; font-weight: 700; margin: 0 0 calc(1.6 * var(--gap));
+  padding-bottom: calc(2.6 * var(--gap)); border-bottom: 0.4pt solid #000;
 }
 .r-p, .r-line, .r-btext { text-align: justify; hyphens: auto; -webkit-hyphens: auto; word-spacing: -0.08em; }
 .r-ul li { text-align: justify; hyphens: auto; -webkit-hyphens: auto; word-spacing: -0.08em; }
@@ -116,7 +117,7 @@
 .tpl-modern .r-contact { display: flex; flex-wrap: wrap; gap: 2pt 12pt; text-align: left; margin: 0; font-size: 0.92em; color: #3a3935; }
 .tpl-modern .r-c { margin: 0; }
 .tpl-modern .r-ico { fill: var(--accent); }
-.sheet.tpl-modern .r-h { font-size: 1.12em; color: var(--accent); border-bottom: 0.6pt solid #cfccc5; padding-bottom: calc(3 * var(--gap)); margin-bottom: calc(3 * var(--gap)); }
+.sheet.tpl-modern .r-h { font-size: 1.12em; color: var(--accent); border-bottom: 0.6pt solid #cfccc5; padding-bottom: calc(2.4 * var(--gap)); margin-bottom: calc(2.6 * var(--gap)); }
 .tpl-modern .r-p, .tpl-modern .r-line, .tpl-modern .r-btext { text-align: left; hyphens: manual; }
 .tpl-modern .r-row .r-r { font-weight: 400; color: #55534e; font-style: normal; }
 .tpl-modern .r-sub .r-r { color: #1d1d1f; }
@@ -134,7 +135,7 @@
 .tpl-compact .r-contact { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 10pt; text-align: center; margin: 0; }
 .tpl-compact .r-c { margin: 0; }
 .tpl-compact .r-sec { margin-top: calc(6 * var(--gap)); }
-.sheet.tpl-compact .r-h { font-family: 'LM Roman Caps', 'LM Roman', serif; font-weight: 400; font-size: 1.18em; padding-bottom: calc(3 * var(--gap)); margin-bottom: calc(-1 * var(--gap)); }
+.sheet.tpl-compact .r-h { font-family: 'LM Roman Caps', 'LM Roman', serif; font-weight: 400; font-size: 1.18em; padding-bottom: calc(2.2 * var(--gap)); margin-bottom: calc(1.6 * var(--gap)); }
 .tpl-compact .r-ul { margin: calc(1.5 * var(--gap)) 0 calc(3 * var(--gap)); }
 .tpl-compact .r-ul li { margin-bottom: calc(1.5 * var(--gap)); }
 .tpl-compact .r-entry + .r-entry { margin-top: calc(3 * var(--gap)); }

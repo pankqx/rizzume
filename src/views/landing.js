@@ -5,6 +5,7 @@ import * as store from '../store.js';
 import { ui } from '../icons.js';
 import { mountMorph, morphHTML } from './morph.js';
 import { openImport } from '../importer/ui.js';
+import { mountBow, bowHTML } from './bow.js';
 
 export function openSample() {
   const r = cloneResume(sampleResume(), { name: 'Sample — Software Developer' });
@@ -50,7 +51,7 @@ export function renderLanding(app) {
     </section>
 
     <section class="band fitdemo">
-      <div class="fitdemo-stage"><div class="fitdemo-sheet" id="fitdemo"></div></div>
+      <div class="fitdemo-stage"><div class="fitdemo-sheet" id="fitdemo"></div><div class="fit-bubble" id="fitbubble" hidden aria-live="polite"><pre class="face"></pre><span class="line"></span></div></div>
       <div>
         <h2>One page. Every time.</h2>
         <p style="color:var(--ink-2);font-size:17px;max-width:32em;margin:0">Add a line and everything tightens a hair. Remove one and it breathes out. Rizzume tunes type size and spacing so the page is always full and never spills onto a second.</p>
@@ -61,6 +62,8 @@ export function renderLanding(app) {
         <div class="meter" id="fitmeter"><span>Page</span><span class="meter-bar"><i></i></span><span class="pct">100%</span></div>
       </div>
     </section>
+
+    ${bowHTML}
 
     <section class="band">
       <h2>Small things that make it feel finished.</h2>
@@ -80,7 +83,7 @@ export function renderLanding(app) {
     </section>
 
     <footer class="footer">
-      <span>Rizzume. Made by Pank in Mangaluru.</span>
+      <span>Rizzume. Made by K S Pankaj.</span>
       <span><a href="https://github.com/pankqx/rizzume" target="_blank" rel="noopener">Source on GitHub</a></span>
     </footer>
   </div>`;
@@ -147,27 +150,82 @@ export function renderLanding(app) {
     'Documented the API with OpenAPI so the mobile team could integrate without meetings.',
   ];
   let added = 0;
+  let shown = 0;
+  const pct = meter.querySelector('.pct');
+  // Count the percentage up/down instead of jumping.
+  const tweenPct = (to, fs) => {
+    const from = shown;
+    const t0 = performance.now();
+    const step = (t) => {
+      const k = Math.min(1, (t - t0) / 450);
+      shown = from + (to - from) * (1 - Math.pow(1 - k, 3));
+      pct.textContent = `${Math.round(shown)}% full · ${fs.toFixed(1)} pt`;
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
   const refit = () => {
     const res = fit(fdSheet, fd);
-    meter.classList.toggle('over', res.overflow);
     meter.querySelector('i').style.width = Math.min(100, res.fill * 100) + '%';
-    meter.querySelector('.pct').textContent = res.overflow ? `Spills ${res.extraLines} lines` : `${Math.round(res.fill * 100)}% full · ${res.fs.toFixed(1)} pt`;
+    tweenPct(Math.min(100, res.fill * 100), res.fs);
+    return res;
   };
   const repaint = () => {
     const fresh = sheetEl(fd);
     fdSheet.replaceChildren(...fresh.childNodes);
-    refit();
+    return refit();
   };
+  const pulse = (cls) => { fdHost.classList.remove('squeeze', 'breathe', 'shake'); void fdHost.offsetWidth; fdHost.classList.add(cls); };
   refit();
-  app.querySelector('[data-add]').onclick = () => {
+
+  // When the page is truly full, the page talks back in ASCII instead of spilling onto a second sheet.
+  const bubble = app.querySelector('#fitbubble');
+  const FULL = [
+    ['(╯°□°)╯︵ ┻━┻', 'no room left. trim, don’t cram.'],
+    ['¯\\_(ツ)_/¯', 'one page is one page.'],
+    ['[■■■■■■■■■■] 100%', 'recruiters skim. keep it tight.'],
+    ['(•_•)  ( •_•)>⌐■-■  (⌐■_■)', 'cool resumes fit on one page.'],
+    ['ʕ•ᴥ•ʔ', 'even the bear says: cut a bullet.'],
+  ];
+  let fullI = 0, typing = 0;
+  const say = ([face, line]) => {
+    clearInterval(typing);
+    bubble.hidden = false;
+    bubble.classList.remove('pop'); void bubble.offsetWidth; bubble.classList.add('pop');
+    const faceEl = bubble.querySelector('.face'), lineEl = bubble.querySelector('.line');
+    faceEl.textContent = face;
+    lineEl.textContent = '';
+    let i = 0;
+    typing = setInterval(() => { lineEl.textContent = line.slice(0, ++i); if (i >= line.length) clearInterval(typing); }, 28);
+    clearTimeout(say.t);
+    say.t = setTimeout(() => (bubble.hidden = true), 4200);
+  };
+  const addBtn = app.querySelector('[data-add]');
+  addBtn.onclick = () => {
     const item = proj.items[added % proj.items.length];
-    item.bullets.push(bullet(extra[added % extra.length]));
+    const b = bullet(extra[added % extra.length]);
+    item.bullets.push(b);
+    const res = repaint();
+    if (res.overflow) {
+      item.bullets.pop();
+      repaint();
+      pulse('shake');
+      say(FULL[fullI++ % FULL.length]);
+      return;
+    }
     added++;
-    repaint();
+    pulse('squeeze');
+    // highlight the line that just arrived
+    const items = [...fdSheet.querySelectorAll('.r-ul li')];
+    const li = items.find((x) => x.textContent.includes(b.text.slice(0, 30)));
+    li?.classList.add('just-added');
   };
   app.querySelector('[data-remove]').onclick = () => {
-    for (const s of fd.sections) if (s.kind === 'entries') for (const it of [...s.items].reverse()) if (it.bullets.length > 1) { it.bullets.pop(); added = Math.max(0, added - 1); return repaint(); }
+    for (const s of fd.sections) if (s.kind === 'entries') for (const it of [...s.items].reverse()) if (it.bullets.length > 1) { it.bullets.pop(); added = Math.max(0, added - 1); bubble.hidden = true; repaint(); pulse('breathe'); return; }
+    say(['(._.)', 'nothing left to cut here.']);
   };
+
+  mountBow(app.querySelector('#bow'));
 
   const unmorph = mountMorph(app.querySelector('.morph'));
   return () => { timers.forEach(clearTimeout); unmorph(); };

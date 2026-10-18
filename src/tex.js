@@ -32,7 +32,7 @@ export function toTex(r) {
 \\hypersetup{colorlinks=true, allcolors=black}
 
 \\titleformat{\\section}{\\large\\bfseries}{}{0em}{}[\\titlerule]
-\\titlespacing{\\section}{0pt}{9pt}{4pt}
+\\titlespacing{\\section}{0pt}{9pt}{5pt}
 
 \\newcommand{\\resumeItemListStart}{\\begin{itemize}[leftmargin=1.15em, itemsep=3pt, topsep=3pt, partopsep=0pt, parsep=0pt]}
 \\newcommand{\\resumeItemListEnd}{\\end{itemize}\\vspace{5pt}}
@@ -81,7 +81,7 @@ export function toTex(r) {
         if (it.url) right = `\\href{${it.url}}{${/github\.com/.test(it.url) ? '\\faGithub' : '\\faLink'}\\ ${right}}`;
         if (it.bulletsOnly) return L.push(list);
         if (s.layout === 'school') {
-          L.push(`${i ? '\\vspace{6pt}\n' : ''}\\textbf{${esc(it.title)}} \\hfill \\textit{${right}} \\\\\n${esc(it.subtitle)} \\hfill \\textbf{${esc(it.subRight)}}\n`);
+          L.push(`${i ? '\\vspace{6pt}\n' : ''}\\textbf{${esc(it.title)}} \\hfill \\textbf{${right}} \\\\\n${esc(it.subtitle)} \\hfill \\textbf{${esc(it.subRight)}}\n`);
         } else if (s.layout === 'compact') {
           const next = s.items[i + 1];
           const end = next && !next.bulletsOnly ? ' \\\\[5pt]' : '';
