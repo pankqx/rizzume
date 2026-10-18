@@ -23,7 +23,7 @@ const norm = (t) => t.toLowerCase().replace(/[^a-z& ]/g, ' ').replace(/\s+/g, ' 
 
 function headingType(line, ctx) {
   const t = line.text.trim();
-  if (line.right || t.length > 48 || line.bullet) return null;
+  if (line.right || t.length > 48 || line.bullet || GRADE_RE.test(t)) return null;
   const n = norm(t);
   if (!n) return null;
   for (const [type, re] of HEADINGS) if (re.test(n)) return type;
@@ -78,10 +78,10 @@ export function parseResume(lines, fileName = 'Imported resume') {
   const head = lines.slice(0, headEnd);
   const nameLine = [...head].filter((l) => !isContact(l.text) && /\p{L}/u.test(l.text) && l.text.split(/\s+/).length <= 5 && l.text.length <= 40).sort((a, b) => b.size - a.size)[0];
   if (nameLine) p.name = nameLine.text.replace(/[|,].*$/, '').trim();
-  const titleLine = head.find((l) => l !== nameLine && !isContact(l.text) && l.text.length > 3 && l.text.length < 110 && head.indexOf(l) > head.indexOf(nameLine));
+  const titleLine = head.find((l) => l !== nameLine && !isContact(l.text) && !/\d{7,}|\+\d|@/.test(l.text.replace(/[\s-]/g, '')) && l.text.length > 3 && l.text.length < 110 && head.indexOf(l) > head.indexOf(nameLine));
   if (titleLine) p.title = titleLine.text.replace(/\s*[|•·]\s*$/, '');
   const segs = head.filter((l) => l !== nameLine && l !== titleLine).flatMap((l) => [l.text, l.right]).join(' | ').split(/\s*[|•·]\s*/);
-  p.location = segs.find((x) => /^[A-Z][\p{L} .]+,\s*[A-Z][\p{L} .]+$/u.test(x.trim()) && x.length < 40) || '';
+  p.location = (segs.find((x) => /^[A-Z][\p{L} .]+,\s*[A-Z][\p{L} .]+$/u.test(x.trim()) && x.length < 40) || '').trim().replace(/,(?=\S)/, ', ');
   i = headEnd;
 
   // ---- sections
@@ -89,6 +89,8 @@ export function parseResume(lines, fileName = 'Imported resume') {
   let entry = null;
   let lastBulletX = null;
   const unsorted = [];
+  const grades = [];
+  const full0 = (l) => [l.text, l.right].filter(Boolean).join(' ');
   const startSection = (type, title) => {
     const s = newSection(type === 'custom' ? 'custom' : type);
     s.title = cap(title).replace(/[:\-–]+\s*$/, '').trim();
@@ -104,6 +106,8 @@ export function parseResume(lines, fileName = 'Imported resume') {
     const ht = headingType(l, ctx);
     if (ht === 'skip') { sec = { kind: 'skip' }; continue; }
     if (ht) { startSection(ht, l.text); continue; }
+    // A stray grade line ("Cgpa : 8.31/10") belongs to education, wherever it was written.
+    if (!l.bullet && GRADE_RE.test(full0(l)) && full0(l).replace(GRADE_RE, '').replace(/[\s:|,-]/g, '').length < 4) { grades.push(full0(l).match(GRADE_RE)[0]); continue; }
     if (!sec) { unsorted.push(l.text); continue; }
     if (sec.kind === 'skip') continue;
     const full = [l.text, l.right].filter(Boolean).join(' ');
@@ -157,13 +161,16 @@ export function parseResume(lines, fileName = 'Imported resume') {
       if (entry && !entry.subtitle && !(d && entry.right) && (!d || !entry.right) && entry.title && !l.bold) {
         const base = l.right && !rightDate ? l.text : full;
         entry.subtitle = pretty((grade ? base.replace(grade[0], '') : d && !l.right ? d.rest : base).replace(/[,|–-]\s*$/, ''));
-        entry.subRight = grade ? pretty(grade[0]) : l.right && !rightDate ? pretty(l.right) : '';
+        entry.subRight = grade ? pretty(grade[0]) : l.right && !rightDate ? pretty(l.right) : entry.subRight;
         if (d && !entry.right) entry.right = d.date;
         continue;
       }
       if (entry && grade && !entry.subRight && full.length < 40) { entry.subRight = pretty(grade[0]); continue; }
-      const title = pretty((d ? d.rest : full).replace(grade?.[0] || '§', ''));
-      addEntry({ title, right: d?.date || '', subRight: grade ? pretty(grade[0]) : '' });
+      let title = pretty((d ? d.rest : full).replace(grade?.[0] || '§', ''));
+      const pursuing = /\(?\s*(currently\s+)?(pursuing|ongoing)\s*\)?/i;
+      const isPursuing = pursuing.test(title);
+      title = pretty(title.replace(pursuing, '')).replace(/\s*[:,|-]\s*$/, '');
+      addEntry({ title, right: d?.date || (isPursuing ? 'Present' : ''), subRight: grade ? pretty(grade[0]) : isPursuing ? 'Pursuing' : '' });
       continue;
     }
     if (layout === 'compact') {
@@ -172,27 +179,43 @@ export function parseResume(lines, fileName = 'Imported resume') {
       continue;
     }
     // role layout: experience, projects, leadership, custom
-    const looksTitle = d || l.bold || l.right || !entry || entry.bullets.length;
-    if (looksTitle && !(entry && !entry.bullets.length && !d && !l.bold && entry.title)) {
-      const right = d?.date || (l.right && !findDate(l.right) ? '' : '');
-      const linkish = /^(code|github|link|demo|live)$/i.test(l.right || '');
-      addEntry({ title: pretty(d ? d.rest : l.text), right: right || (linkish ? l.right : ''), url: linkish && p.github ? `https://github.com/${p.github}` : '' });
+    // A plain (not bold, no date) line after a title is either a short second header line ("Company, City")
+    // or the start of a description paragraph. Paragraph lines are joined back into one bullet.
+    if (entry && entry.desc && !l.bold && !d) {
+      const bl = entry.bullets[entry.bullets.length - 1];
+      bl.text = pretty(join(bl.text, full));
       continue;
     }
-    // Second line of a role header ("Company, City" or "Role"), before any bullets.
-    if (entry && !entry.bullets.length) {
-      const extra = pretty(d ? d.rest : full);
-      if (d && !entry.right) entry.right = d.date;
-      if (extra) entry.title = entry.title ? `${entry.title} — ${extra}` : extra;
+    const plain = entry && !l.bold && !d && !l.right;
+    const shortHeader = plain && !entry.bullets.length && full.length <= 60 && !/[.!?]$/.test(full) && full.split(/\s+/).length <= 9 && !entry.headerExtra;
+    if (shortHeader) {
+      entry.title = entry.title ? `${entry.title} — ${pretty(full)}` : pretty(full);
+      entry.headerExtra = true;
       continue;
     }
-    unsorted.push(full);
+    if (plain) {
+      entry.bullets.push(bullet(pretty(full)));
+      entry.desc = true;
+      lastBulletX = null;
+      continue;
+    }
+    const linkish = /^(code|github|link|demo|live)$/i.test(l.right || '');
+    addEntry({ title: pretty((d ? d.rest : l.text).replace(/\s*:\s*$/, '')), right: d?.date || (linkish ? l.right : ''), url: linkish && p.github ? `https://github.com/${p.github}` : '' });
+    continue;
   }
 
+
   // ---- tidy
+  const edu = r.sections.find((x) => x.type === 'education');
+  if (edu && grades.length) {
+    for (const g of grades) {
+      const target = edu.items.find((e) => !e.subRight) || edu.items.find((e) => !GRADE_RE.test(e.subRight)) || edu.items[0];
+      if (target) target.subRight = pretty(g.replace(/\s*:\s*/, ': ').replace(/^cgpa/i, 'CGPA').replace(/^gpa/i, 'GPA'));
+    }
+  }
   r.sections = r.sections.filter((s) => s.kind !== 'skip').filter((s) => (s.kind === 'text' ? s.text : s.kind === 'lines' ? s.rows.length : s.items.length));
   for (const s of r.sections) {
-    if (s.kind === 'entries') for (const e of s.items) { delete e.fromBullet; e.title = e.title.replace(/\s*[|•·,]\s*$/, ''); if (s.type === 'projects' && !e.right && e.url) e.right = 'Code'; }
+    if (s.kind === 'entries') for (const e of s.items) { delete e.fromBullet; delete e.desc; delete e.headerExtra; e.title = e.title.replace(/\s*[|•·,]\s*$/, ''); if (s.type === 'projects' && !e.right && e.url) e.right = 'Code'; }
     if (s.kind === 'lines' && s.type !== 'skills' && s.rows.every((x) => !x.label)) s.rows.forEach((x) => (x.label = 'Details'));
     report.sections.push({ title: s.title, kind: s.kind, count: s.kind === 'text' ? 1 : s.kind === 'lines' ? s.rows.length : s.items.length, bullets: s.kind === 'entries' ? s.items.reduce((a, e) => a + e.bullets.length, 0) : 0 });
   }
