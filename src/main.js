@@ -4,6 +4,7 @@ import * as store from './store.js';
 import { renderLanding } from './views/landing.js';
 import { renderLibrary } from './views/library.js';
 import { renderEditor } from './views/editor.js';
+import { countVisit } from './counter.js';
 
 store.load();
 applyTheme();
@@ -50,6 +51,7 @@ async function boot() {
   setTimeout(() => el.remove(), 600);
 }
 boot();
+countVisit();
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));

@@ -7,6 +7,7 @@ import { saveBlob, fileBase } from '../files.js';
 const downloadPdf = (r) => import('../pdf.js').then((m) => m.downloadPdf(r));
 import { toTex } from '../tex.js';
 import { openReveal } from '../reveal.js';
+import { countDownload } from '../counter.js';
 import { openImport } from '../importer/ui.js';
 import { ui } from '../icons.js';
 import { h, esc, menu, toast, ask } from '../ui.js';
@@ -723,7 +724,7 @@ export function renderEditor(app, id) {
   async function doPdf() {
     commitPending();
     openReveal(r, {
-      onPdf: () => downloadPdf(r),
+      onPdf: () => downloadPdf(r).then((n) => { countDownload(); return n; }),
       onTex: doTex,
       onJson: doJson,
       onTailor: async () => { const c = await tailorCopy(r); if (c) { location.hash = `#/edit/${c.id}`; toast(`Now editing “${c.name}”`); } },

@@ -13,6 +13,7 @@ Resumes with rizz. A free, offline resume builder that types like LaTeX and edit
 - **A copy per role.** Keep a base resume and tailored copies side by side.
 - **Exports:** PDF, standalone `.tex` (compiles on Overleaf), and `.json` backups.
 - **Private and offline.** Everything stays in your browser's storage. Installable as an app.
+- **Visit counter.** The footer shows total visits and PDFs downloaded, counted with [Abacus](https://v2.jasoncameron.dev/abacus/) (namespace `rizzume-pankqx`). Only the two numbers are sent, never resume content. Local development uses a separate `rizzume-dev` namespace.
 
 Templates: Classic, Modern (sans with an accent colour) and Compact (small caps, tighter).
 

@@ -589,3 +589,16 @@ input[type='range'] { accent-color: var(--ember); width: 140px; }
 .bow-stage .stamp rect { fill: rgba(226, 83, 31, .08); stroke: #e2531f; stroke-width: 2.5; }
 .bow-stage .stamp text { font: 800 17px var(--ui); letter-spacing: .12em; fill: #e2531f; }
 @media (max-width: 920px) { .bowband { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- visit counter ---------- */
+.stats { display: inline-flex; gap: 18px; flex-wrap: wrap; }
+.stat { display: inline-flex; align-items: baseline; gap: 6px; }
+.odo { display: inline-flex; font-family: var(--display); font-weight: 400; font-size: 20px; color: var(--ink); line-height: 1; font-variant-numeric: tabular-nums; }
+.odo-d { display: inline-block; height: 1em; overflow: hidden; }
+.odo-col { display: flex; flex-direction: column; transform: translateY(0); }
+.odo-col i { font-style: normal; height: 1em; line-height: 1; }
+.odo.roll .odo-col { transform: translateY(calc(var(--n) * -1em)); transition: transform 1.6s cubic-bezier(.16, 1, .3, 1); }
+.odo.roll .odo-d:nth-last-child(1) .odo-col { transition-delay: .25s; }
+.odo.roll .odo-d:nth-last-child(2) .odo-col { transition-delay: .18s; }
+.odo.roll .odo-d:nth-last-child(3) .odo-col { transition-delay: .12s; }
+.odo.roll .odo-d:nth-last-child(4) .odo-col { transition-delay: .06s; }

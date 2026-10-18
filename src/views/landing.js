@@ -6,6 +6,7 @@ import { ui } from '../icons.js';
 import { mountMorph, morphHTML } from './morph.js';
 import { openImport } from '../importer/ui.js';
 import { mountBow, bowHTML } from './bow.js';
+import { countVisit, getDownloads, odometer } from '../counter.js';
 
 export function openSample() {
   const r = cloneResume(sampleResume(), { name: 'Sample — Software Developer' });
@@ -84,6 +85,7 @@ export function renderLanding(app) {
 
     <footer class="footer">
       <span>Rizzume. Made by K S Pankaj.</span>
+      <span class="stats" hidden><span class="stat"><b class="odo" data-odo="visits"></b> visits</span><span class="stat"><b class="odo" data-odo="pdfs"></b> resumes downloaded</span></span>
       <span><a href="https://github.com/pankqx/rizzume" target="_blank" rel="noopener">Source on GitHub</a></span>
     </footer>
   </div>`;
@@ -226,6 +228,20 @@ export function renderLanding(app) {
   };
 
   mountBow(app.querySelector('#bow'));
+
+  // Visit / download counters roll in when the footer comes into view.
+  const stats = app.querySelector('.stats');
+  Promise.all([countVisit(), getDownloads()]).then(([v, d]) => {
+    if (v == null) return;
+    stats.hidden = false;
+    const io = new IntersectionObserver((es) => {
+      if (!es.some((e) => e.isIntersecting)) return;
+      io.disconnect();
+      odometer(stats.querySelector('[data-odo="visits"]'), v);
+      odometer(stats.querySelector('[data-odo="pdfs"]'), d);
+    });
+    io.observe(stats);
+  });
 
   const unmorph = mountMorph(app.querySelector('.morph'));
   return () => { timers.forEach(clearTimeout); unmorph(); };
