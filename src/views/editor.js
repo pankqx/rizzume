@@ -203,11 +203,26 @@ export function renderEditor(app, id) {
     if (e.key === 'Enter') {
       e.preventDefault();
       if (isBullet) {
+        // Enter adds a fresh point and never cuts the current one in half. Wrapped lines made
+        // End/clicks land mid-point, so splitting on Enter broke points. Shift+Enter still splits.
         const list = getAt(r, path.slice(0, -2));
         const bi = path[path.length - 2];
-        list[bi].text = text.slice(0, off ?? text.length).trimEnd();
-        list.splice(bi + 1, 0, bullet(text.slice(off ?? text.length).trimStart()));
-        commit({ focus: { path: [...path.slice(0, -2), bi + 1, 'text'].join('.'), caret: 0 } });
+        const base = path.slice(0, -2);
+        list[bi].text = text.replace(/\n/g, ' ');
+        if (!text.trim() && !e.shiftKey) return; // already on an empty point: nothing to add
+        let at;
+        if (e.shiftKey && off != null && off > 0 && off < text.length) {
+          list[bi].text = text.slice(0, off).trimEnd();
+          list.splice(bi + 1, 0, bullet(text.slice(off).trimStart()));
+          at = bi + 1;
+        } else if (off === 0 && text.trim()) {
+          list.splice(bi, 0, bullet());
+          at = bi;
+        } else {
+          list.splice(bi + 1, 0, bullet());
+          at = bi + 1;
+        }
+        commit({ focus: { path: [...base, at, 'text'].join('.'), caret: 0 } });
       } else if (path[0] === 'sections' && path[2] === 'rows') {
         const rows = getAt(r, path.slice(0, 3));
         rows.splice(path[3] + 1, 0, { id: uid(), label: '', value: '' });
@@ -247,6 +262,17 @@ export function renderEditor(app, id) {
         }
       }
     }
+    if (isBullet && e.altKey && (e.key === 'ArrowUp' || e.key === 'ArrowDown')) {
+      e.preventDefault();
+      const list = getAt(r, path.slice(0, -2));
+      const bi = path[path.length - 2], to = bi + (e.key === 'ArrowUp' ? -1 : 1);
+      if (to < 0 || to >= list.length) return;
+      list[bi].text = text;
+      [list[bi], list[to]] = [list[to], list[bi]];
+      commit({ focus: { path: [...path.slice(0, -2), to, 'text'].join('.'), caret: off ?? 'end' } });
+      return;
+    }
+    if (e.key === 'Tab' && isBullet) e.preventDefault();
     if ((e.key === 'ArrowDown' && off === text.length) || (e.key === 'ArrowUp' && off === 0)) {
       if (moveFocus(el, e.key === 'ArrowDown' ? 1 : -1)) e.preventDefault();
     }
@@ -271,7 +297,8 @@ export function renderEditor(app, id) {
       const bi = path[path.length - 2];
       const off = caretOffset(el) ?? el.textContent.length;
       const cur = el.textContent;
-      list[bi].text = (cur.slice(0, off) + lines[0]).trim();
+      const head = cur.slice(0, off).trimEnd();
+      list[bi].text = head ? `${head} ${lines[0]}` : lines[0];
       const rest = lines.slice(1).map((l) => bullet(l));
       if (cur.slice(off).trim()) rest[rest.length - 1].text += ' ' + cur.slice(off).trim();
       list.splice(bi + 1, 0, ...rest);
@@ -294,7 +321,17 @@ export function renderEditor(app, id) {
     const wr = wrap.getBoundingClientRect();
     const br = block.getBoundingClientRect();
     let html = '', label = '';
-    if (block.classList.contains('r-entry')) {
+    if (block.matches('.r-ul li')) {
+      const [si, ii] = block.closest('.r-entry').dataset.entry.split('.').map(Number);
+      const bi = +block.dataset.b;
+      const n = r.sections[si].items[ii].bullets.length;
+      label = 'Point';
+      html = `<button class="icon-btn" data-g="addPointBelow" title="Add a point below (Enter)" aria-label="Add a point below">${ui('plus', 16)}</button>
+        <button class="icon-btn" data-g="upPoint" title="Move up (Alt+↑)" aria-label="Move point up" ${bi === 0 ? 'disabled' : ''}>${ui('up', 16)}</button>
+        <button class="icon-btn" data-g="downPoint" title="Move down (Alt+↓)" aria-label="Move point down" ${bi === n - 1 ? 'disabled' : ''}>${ui('down', 16)}</button>
+        <button class="icon-btn danger" data-g="delPoint" title="Delete point" aria-label="Delete point">${ui('trash', 16)}</button>`;
+      gutter.dataset.si = si; gutter.dataset.ii = ii; gutter.dataset.bi = bi;
+    } else if (block.classList.contains('r-entry')) {
       const [si, ii] = block.dataset.entry.split('.').map(Number);
       const s = r.sections[si];
       label = 'Entry';
@@ -335,7 +372,7 @@ export function renderEditor(app, id) {
   }
   sheet.addEventListener('pointermove', (e) => {
     if (e.pointerType === 'touch') return;
-    const blk = e.target.closest('.r-h') || e.target.closest('.r-line') || e.target.closest('.r-entry');
+    const blk = e.target.closest('.r-h') || e.target.closest('.r-line') || e.target.closest('.r-ul li') || e.target.closest('.r-entry');
     if (blk) showGutter(blk);
     else if (!e.target.closest('.r-sec')) hideGutter();
   });
@@ -344,13 +381,24 @@ export function renderEditor(app, id) {
   gutter.addEventListener('click', (e) => {
     const b = e.target.closest('[data-g]');
     if (!b) return;
-    const si = +gutter.dataset.si, ii = +gutter.dataset.ii, ri = +gutter.dataset.ri;
+    const si = +gutter.dataset.si, ii = +gutter.dataset.ii, ri = +gutter.dataset.ri, bi = +gutter.dataset.bi;
     const s = r.sections[si];
     const act = b.dataset.g;
     const swap = (arr, i, j) => { if (j < 0 || j >= arr.length) return false; [arr[i], arr[j]] = [arr[j], arr[i]]; return true; };
     let focus;
     switch (act) {
-      case 'addBullet': s.items[ii].bullets.push(bullet()); s.items[ii].bulletsOnly = s.items[ii].bulletsOnly && true; focus = { path: `sections.${si}.items.${ii}.bullets.${s.items[ii].bullets.length - 1}.text` }; break;
+      case 'addBullet': s.items[ii].bullets.push(bullet()); focus = { path: `sections.${si}.items.${ii}.bullets.${s.items[ii].bullets.length - 1}.text` }; break;
+      case 'addPointBelow': s.items[ii].bullets.splice(bi + 1, 0, bullet()); focus = { path: `sections.${si}.items.${ii}.bullets.${bi + 1}.text`, caret: 0 }; break;
+      case 'upPoint': swap(s.items[ii].bullets, bi, bi - 1); break;
+      case 'downPoint': swap(s.items[ii].bullets, bi, bi + 1); break;
+      case 'delPoint': {
+        const list = s.items[ii].bullets;
+        const gone = list.splice(bi, 1)[0];
+        commit();
+        hideGutter(true);
+        if (gone.text) toast('Point deleted', { action: 'Undo', onAction: () => { list.splice(bi, 0, gone); commit(); } });
+        return;
+      }
       case 'link': return linkPopover(b, s.items[ii]);
       case 'dupItem': s.items.splice(ii + 1, 0, { ...JSON.parse(JSON.stringify(s.items[ii])), id: uid() }); s.items[ii + 1].bullets.forEach((x) => (x.id = uid())); focus = { path: `sections.${si}.items.${ii + 1}.title` }; break;
       case 'upItem': swap(s.items, ii, ii - 1); break;
@@ -387,28 +435,37 @@ export function renderEditor(app, id) {
     return { path: `sections.${si}.text` };
   }
   function linkPopover(anchor, item) {
-    const pop = h(`<form class="link-pop"><input class="input" placeholder="https://github.com/you/project" value="${esc(item.url)}" aria-label="Link URL"><button class="btn sm primary">Save</button>${item.url ? `<button type="button" class="btn sm ghost" data-rm>Remove</button>` : ''}</form>`);
+    const start = (item.links && item.links.length ? item.links : item.url ? [{ label: /github\.com/.test(item.url) ? 'GitHub' : 'Link', url: item.url }] : []).slice(0, 3);
+    while (start.length < 2) start.push({ label: start.length ? 'Live' : 'GitHub', url: '' });
+    const rowHtml = (l, i) => `<div class="link-row"><input class="input lp-label" placeholder="${i ? 'Live' : 'GitHub'}" value="${esc(l.label)}" aria-label="Link ${i + 1} text"><input class="input lp-url" placeholder="https://github.com/you/project" value="${esc(l.url)}" aria-label="Link ${i + 1} address"></div>`;
+    const pop = h(`<form class="link-pop link-pop-multi"><b class="lp-h">Links</b>${start.map(rowHtml).join('')}<div class="lp-actions"><button class="btn sm primary">Save</button>${item.url || item.links?.length ? `<button type="button" class="btn sm ghost" data-rm>Remove all</button>` : ''}</div></form>`);
     const wr = wrap.getBoundingClientRect(), ar = anchor.getBoundingClientRect();
     pop.style.left = ar.right - wr.left + 8 + 'px';
     pop.style.top = ar.top - wr.top - 6 + 'px';
     wrap.appendChild(pop);
-    const inp = pop.querySelector('input');
-    inp.focus();
-    inp.select();
+    const first = pop.querySelector('.lp-url');
+    first.focus();
     const close = () => { pop.remove(); document.removeEventListener('pointerdown', outside); };
     const outside = (e) => { if (!pop.contains(e.target)) close(); };
     setTimeout(() => document.addEventListener('pointerdown', outside));
     pop.onsubmit = (e) => {
       e.preventDefault();
-      let v = inp.value.trim();
-      if (v && !/^https?:\/\//.test(v) && !/^mailto:/.test(v)) v = 'https://' + v;
-      item.url = v;
-      if (v && !item.right) item.right = /github\.com/.test(v) ? 'Code' : 'Link';
+      const links = [...pop.querySelectorAll('.link-row')]
+        .map((row) => {
+          let url = row.querySelector('.lp-url').value.trim();
+          const label = row.querySelector('.lp-label').value.trim();
+          if (url && !/^https?:\/\//.test(url) && !/^mailto:/.test(url)) url = 'https://' + url;
+          return { label: label || (/github\.com/.test(url) ? 'GitHub' : 'Link'), url };
+        })
+        .filter((l) => l.url);
+      item.links = links;
+      item.url = links[0]?.url || '';
+      if (item.url && !item.right && r.template !== 'pankaj') item.right = /github\.com/.test(item.url) ? 'Code' : 'Link';
       close();
       commit();
     };
-    pop.querySelector('[data-rm]')?.addEventListener('click', () => { item.url = ''; close(); commit(); });
-    inp.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    pop.querySelector('[data-rm]')?.addEventListener('click', () => { item.url = ''; item.links = []; close(); commit(); });
+    pop.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
   }
 
   // ---------------- proof marks ----------------
@@ -509,6 +566,7 @@ export function renderEditor(app, id) {
       <div class="panel-h">Contact</div>
       ${field('name', 'Full name', 'K S Pankaj')}
       ${field('title', 'Headline', 'Software Developer | Full-Stack')}
+      ${r.template === 'pankaj' ? field('tagline', 'Tagline', 'Full-stack applications, APIs and cloud deployment') : ''}
       ${field('email', 'Email', 'you@email.com')}
       ${field('phone', 'Phone', '+91 98765 43210')}
       ${field('linkedin', 'LinkedIn', 'username', 'linkedin.com/in/')}
@@ -538,7 +596,7 @@ export function renderEditor(app, id) {
       })
     );
     panelBody.querySelector('[data-addsec]').onclick = (e) => {
-      const names = { profile: 'Profile', skills: 'Skills', experience: 'Experience', projects: 'Projects', education: 'Education', certifications: 'Certifications', leadership: 'Leadership', achievements: 'Achievements', additional: 'Additional', custom: 'Custom section' };
+      const names = { profile: 'Profile', skills: 'Skills', experience: 'Experience', projects: 'Projects', education: 'Education', certifications: 'Certifications', leadership: 'Leadership', achievements: 'Achievements', additional: 'Additional', research: 'Research', declaration: 'Declaration', custom: 'Custom section' };
       menu(e.currentTarget, Object.keys(SECTION_PRESETS).map((k) => ({
         label: names[k], onClick: () => {
           const s = newSection(k);
@@ -620,7 +678,7 @@ export function renderEditor(app, id) {
       </div>
       <div class="panel-h">Accent</div>
       <div class="swatches ${r.template === 'modern' ? '' : 'disabled-block'}">${Object.entries(ACCENTS).map(([k, c]) => `<button class="swatch" data-acc="${k}" style="background:${c}" aria-label="${k}" aria-pressed="${st.accent === k}"></button>`).join('')}</div>
-      <p class="hint" style="margin-top:8px">${r.template === 'modern' ? 'Used for your name, headings and bullets.' : 'Colour is used by the Modern template. Classic and Compact stay black, like print.'}</p>`;
+      <p class="hint" style="margin-top:8px">${r.template === 'modern' ? 'Used for your name, headings and bullets.' : 'Colour is used by the Modern template. Classic, Compact and Placement stay black, like print.'}</p>`;
     panelBody.querySelectorAll('[data-tpl]').forEach((b) => {
       const k = b.dataset.tpl;
       const th = b.querySelector('.tpl-thumb');
@@ -744,9 +802,13 @@ export function renderEditor(app, id) {
       { label: 'All resumes', icon: ui('back', 16), onClick: () => (location.hash = '#/resumes') },
     ], { align: 'right' });
   function shortcuts() {
-    toast('Enter: new bullet · Backspace on empty: remove · Ctrl+Z / Ctrl+Shift+Z: undo, redo · Ctrl+P: PDF', { ms: 7000 });
+    toast('Enter: new point · Shift+Enter: split here · Alt+↑/↓: move point · Backspace on empty: remove · Ctrl+Z: undo · Ctrl+P: PDF', { ms: 8000 });
   }
 
+  const flush = () => { clearTimeout(timers.save); store.put(r); };
+  const onVis = () => { if (document.visibilityState === 'hidden') flush(); };
+  addEventListener('pagehide', flush);
+  document.addEventListener('visibilitychange', onVis);
   const onKey = (e) => {
     const mod = e.ctrlKey || e.metaKey;
     if (!mod) return;
@@ -768,6 +830,8 @@ export function renderEditor(app, id) {
 
   return () => {
     document.removeEventListener('keydown', onKey);
+    removeEventListener('pagehide', flush);
+    document.removeEventListener('visibilitychange', onVis);
     clearTimeout(warm);
     ro.disconnect();
     Object.values(timers).forEach(clearTimeout);

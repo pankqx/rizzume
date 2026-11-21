@@ -8,6 +8,10 @@
 @font-face { font-family: 'LM Roman'; src: url('../fonts/lmroman10-italic.woff2') format('woff2'); font-weight: 400; font-style: italic; font-display: block; }
 @font-face { font-family: 'LM Roman'; src: url('../fonts/lmroman10-bolditalic.woff2') format('woff2'); font-weight: 700; font-style: italic; font-display: block; }
 @font-face { font-family: 'LM Roman Caps'; src: url('../fonts/lmromancaps10-regular.woff2') format('woff2'); font-weight: 400; font-display: block; }
+@font-face { font-family: 'Termes'; src: url('../fonts/termes-regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: block; }
+@font-face { font-family: 'Termes'; src: url('../fonts/termes-bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: block; }
+@font-face { font-family: 'Termes'; src: url('../fonts/termes-italic.ttf') format('truetype'); font-weight: 400; font-style: italic; font-display: block; }
+@font-face { font-family: 'Termes'; src: url('../fonts/termes-bolditalic.ttf') format('truetype'); font-weight: 700; font-style: italic; font-display: block; }
 @font-face { font-family: 'Plex Sans'; src: url('../fonts/plexsans-400-normal.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: block; }
 @font-face { font-family: 'Plex Sans'; src: url('../fonts/plexsans-700-normal.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: block; }
 @font-face { font-family: 'Plex Sans'; src: url('../fonts/plexsans-400-italic.ttf') format('truetype'); font-weight: 400; font-style: italic; font-display: block; }
@@ -139,6 +143,48 @@
 .tpl-compact .r-ul { margin: calc(1.5 * var(--gap)) 0 calc(3 * var(--gap)); }
 .tpl-compact .r-ul li { margin-bottom: calc(1.5 * var(--gap)); }
 .tpl-compact .r-entry + .r-entry { margin-top: calc(3 * var(--gap)); }
+
+
+/* ============================================================
+   Template: Placement (the hand-written LaTeX campus resume)
+   ============================================================ */
+.tpl-pankaj { font-family: 'Termes', 'TeX Gyre Termes', 'Times New Roman', serif; line-height: 1.175; --link: rgb(20, 60, 140); }
+.tpl-pankaj .r-head { gap: 10pt; margin-bottom: calc(3 * var(--gap)); align-items: flex-start; }
+.tpl-pankaj .r-id { flex: 0 1 55%; margin-top: 0; }
+.tpl-pankaj .r-name { font-size: 1.728em; line-height: 1.1; font-weight: 700; padding-top: 0; margin-bottom: 7pt; }
+.tpl-pankaj .r-title { font-style: normal; margin-top: 0; }
+.tpl-pankaj .r-tag { font-size: 0.9em; }
+.tpl-pankaj .r-contact { flex: 0 1 45%; font-size: 1em; line-height: 1.175; margin-top: 0; }
+.tpl-pankaj .r-c { margin-bottom: 1pt; }
+.tpl-pankaj .r-lnk, .tpl-pankaj .r-links { color: var(--link); }
+.tpl-pankaj .r-links .r-bar, .tpl-pankaj .r-c .r-bar { color: #000; }
+.tpl-pankaj .r-hr { border-bottom: 0.4pt solid #000; height: 0; }
+.tpl-pankaj .r-sec { margin-top: calc(6 * var(--gap)); }
+.sheet.tpl-pankaj .r-h { font-size: 1.2em; line-height: 1.1; font-weight: 700; padding-bottom: calc(1.2 * var(--gap)); margin: 0 0 calc(3 * var(--gap)); border-bottom: 0.4pt solid #000; letter-spacing: 0.01em; }
+.tpl-pankaj .r-sc { font-size: 0.8em; }
+.tpl-pankaj.is-edit .r-h [contenteditable] { font-variant-caps: small-caps; }
+.tpl-pankaj .r-p, .tpl-pankaj .r-line, .tpl-pankaj .r-btext, .tpl-pankaj .r-ul li { word-spacing: 0; hyphens: manual; -webkit-hyphens: manual; }
+.sheet.tpl-pankaj .r-row .r-r { font-size: 0.9em; font-weight: 400; font-style: normal; }
+.tpl-pankaj .r-sub { padding-left: 0.8em; }
+.tpl-pankaj .r-sub > span:first-child { font-size: 0.9em; font-style: italic; }
+.tpl-pankaj .r-sub .r-r { font-weight: 400; font-style: normal; }
+.sheet.tpl-pankaj [data-type="projects"] .r-row .r-r { font-style: italic; }
+.tpl-pankaj .r-links { font-size: 0.9em; font-weight: 400; }
+.tpl-pankaj .r-det { font-weight: 400; }
+.tpl-pankaj .r-role > .r-row + .r-ul, .tpl-pankaj .r-role > .r-sub + .r-ul, .tpl-pankaj .r-ul { margin: calc(1.5 * var(--gap) + 1pt) 0 calc(1 * var(--gap)); padding-left: 1.2em; }
+.tpl-pankaj .r-ul li { margin-bottom: calc(1 * var(--gap)); }
+.tpl-pankaj .r-bul { left: -0.95em; }
+.tpl-pankaj .r-entry + .r-entry, .tpl-pankaj .r-role + .r-role { margin-top: calc(1 * var(--gap)); }
+.tpl-pankaj .r-k-entries:has(.r-entry:last-child > .r-ul) + .r-sec { margin-top: calc(6 * var(--gap)); }
+.tpl-pankaj .r-tbl { font-size: 0.9em; }
+.tpl-pankaj .r-trule, .tpl-pankaj .r-thead, .tpl-pankaj .r-tend { border-bottom: 0.4pt solid #000; }
+.tpl-pankaj .r-trule, .tpl-pankaj .r-tend { height: 0; }
+.tpl-pankaj .r-thead, .tpl-pankaj .r-trow { display: grid; grid-template-columns: 2.45fr 2.6fr 1.05fr 0.8fr; column-gap: 8pt; padding: calc(0.6 * var(--gap)) 0; }
+.tpl-pankaj .r-entry.r-trow + .r-entry.r-trow { margin-top: 0; }
+.tpl-pankaj .r-thead { margin-bottom: calc(0.6 * var(--gap)); }
+.tpl-pankaj .r-tend { margin-top: calc(0.6 * var(--gap)); }
+.tpl-pankaj .r-decl { margin-top: calc(8 * var(--gap)); font-size: 0.8em; font-style: italic; }
+.tpl-pankaj .r-decl .r-p { text-align: left; }
 
 /* ============================================================
    Editing affordances (screen only, never in the PDF)

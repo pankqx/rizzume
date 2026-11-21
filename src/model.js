@@ -12,13 +12,15 @@ export const SECTION_PRESETS = {
   leadership: { kind: 'entries', layout: 'role', title: 'Leadership & Community', tight: true },
   achievements: { kind: 'entries', layout: 'compact', title: 'Achievements' },
   additional: { kind: 'lines', title: 'Additional' },
+  research: { kind: 'entries', layout: 'role', title: 'Research' },
+  declaration: { kind: 'text', title: 'Declaration' },
   custom: { kind: 'entries', layout: 'role', title: 'New Section' },
 };
 
 export const bullet = (text = '') => ({ id: uid(), text });
 
 export function blankEntry(layout = 'role') {
-  const e = { id: uid(), title: '', detail: '', right: '', subtitle: '', subRight: '', url: '', bullets: [] };
+  const e = { id: uid(), title: '', detail: '', right: '', subtitle: '', subRight: '', url: '', links: [], bullets: [] };
   if (layout === 'role') e.bullets = [bullet()];
   return e;
 }
@@ -47,7 +49,7 @@ export function blankResume(name = 'Untitled resume') {
     style: defaultStyle(),
     createdAt: Date.now(),
     updatedAt: Date.now(),
-    personal: { name: '', title: '', email: '', phone: '', linkedin: '', github: '', website: '', location: '' },
+    personal: { name: '', title: '', tagline: '', email: '', phone: '', linkedin: '', github: '', website: '', location: '' },
     sections: ['profile', 'skills', 'experience', 'projects', 'education', 'certifications'].map(newSection),
   };
 }
@@ -163,6 +165,7 @@ export function normalize(raw) {
         ...blankEntry('compact'),
         ...e,
         id: e.id || uid(),
+        links: Array.isArray(e.links) ? e.links.filter((l) => l && (l.url || l.label)).map((l) => ({ label: String(l.label || ''), url: String(l.url || '') })) : [],
         bullets: (e.bullets || []).map((b) => (typeof b === 'string' ? bullet(b) : { id: b.id || uid(), text: b.text || '' })),
       }));
     if (s.kind === 'text') s.text = s.text || '';
